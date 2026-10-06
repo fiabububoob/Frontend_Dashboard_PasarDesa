@@ -12,7 +12,7 @@ export function Topbar() {
   const { open } = useDetail();
 
   return (
-    <header className="relative z-30 flex items-center gap-3 bg-surface px-4 py-4 lg:px-8">
+    <header className="relative z-30 flex items-center gap-3 border-b border-line bg-surface px-4 py-3.5 lg:px-8">
       <SearchBox />
       <div className="flex-1" aria-hidden />
       <NotificationMenu />
