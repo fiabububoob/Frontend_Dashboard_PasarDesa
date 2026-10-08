@@ -1,5 +1,6 @@
 "use client";
 
+import { FotoProduk } from "@/components/ui/FotoProduk";
 import { Badge } from "@/components/ui/Badge";
 import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { useDetail } from "@/components/detail/DetailProvider";
@@ -30,7 +31,7 @@ export function RincianPesanan({ pesanan }: { pesanan: Pesanan }) {
             return (
               <div key={item.komoditas} className="flex items-center justify-between border-b border-line pb-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-surface-muted text-lg">{katalog?.gambar ?? IKON_BAWAAN}</div>
+                  <FotoProduk nama={item.komoditas} foto={katalog?.foto?.[0]} ikon={katalog?.gambar ?? IKON_BAWAAN} className="h-10 w-10 text-lg" />
                   <div>
                     <p className="flex items-center gap-1.5 text-sm font-medium text-ink-900">
                       {katalog ? (

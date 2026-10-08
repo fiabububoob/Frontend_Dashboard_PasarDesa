@@ -36,7 +36,7 @@ export const KOMODITAS_LIST: Komoditas[] = [
     sku: "SKR-JGN-01",
     nama: "Jagung Manis Organik Blok Timur 1kg",
     gambar: "🌽",
-    kategori: "Palawija & Jagung",
+    kategori: "Sayur Petik Pagi",
     asalBlok: "Blok Sawah Timur (RT 04)",
     harga: 12000,
     satuan: "kg",
@@ -72,7 +72,7 @@ export const KOMODITAS_LIST: Komoditas[] = [
     sku: "SKR-BWG-01",
     nama: "Bawang Merah Brebes Sukorejo 1kg",
     gambar: "🧅",
-    kategori: "Palawija & Jagung",
+    kategori: "Sayur Petik Pagi",
     asalBlok: "Tegalrejo Lor (RT 02)",
     harga: 34000,
     satuan: "kg",
@@ -89,7 +89,7 @@ export const KOMODITAS_LIST: Komoditas[] = [
     sku: "SKR-TLR-10",
     nama: "Telur Ayam Kampung Asli 10 Butir",
     gambar: "🥚",
-    kategori: "Ternak / Unggas",
+    kategori: "Telur & Ayam",
     asalBlok: "Kandang Warga Berdaya RW 02",
     harga: 26000,
     satuan: "mika",
@@ -177,7 +177,7 @@ export const KOMODITAS_LIST: Komoditas[] = [
     sku: "SKR-KDL-01",
     nama: "Kedelai Lokal Grade A 1kg",
     gambar: "🫘",
-    kategori: "Palawija & Jagung",
+    kategori: "Dapur & Rumah",
     asalBlok: "Blok Sawah Timur (RT 04)",
     harga: 14500,
     satuan: "kg",
@@ -194,7 +194,7 @@ export const KOMODITAS_LIST: Komoditas[] = [
     sku: "SKR-AYM-01",
     nama: "Ayam Kampung Potong Segar 1kg",
     gambar: "🍗",
-    kategori: "Ternak / Unggas",
+    kategori: "Telur & Ayam",
     asalBlok: "Kandang Warga Berdaya RW 02",
     harga: 65000,
     satuan: "ekor",
@@ -212,7 +212,7 @@ export const KOMODITAS_LIST: Komoditas[] = [
     sku: "SKR-TLB-06",
     nama: "Telur Bebek Asin Matang 6 Butir",
     gambar: "🥚",
-    kategori: "Ternak / Unggas",
+    kategori: "Telur & Ayam",
     asalBlok: "Kandang Warga Berdaya RW 02",
     harga: 24000,
     satuan: "mika",
@@ -226,12 +226,4 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
 ];
 
-// Daftar kategori baku — dipakai filter, form tambah/ubah, dan impor CSV.
-export const KATEGORI_KOMODITAS = ["Beras & Gabah", "Sayur Petik Pagi", "Palawija & Jagung", "Ternak / Unggas"] as const;
 
-export const IKON_KATEGORI: Record<string, string> = {
-  "Beras & Gabah": "🌾",
-  "Sayur Petik Pagi": "🥬",
-  "Palawija & Jagung": "🌽",
-  "Ternak / Unggas": "🥚",
-};

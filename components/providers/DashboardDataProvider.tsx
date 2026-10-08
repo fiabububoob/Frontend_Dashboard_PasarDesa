@@ -52,14 +52,12 @@ export function DashboardDataProvider({ children }: { children: ReactNode }) {
     () => ({
       ...komoditas,
       pesanan: pesananSlice.pesanan,
-      tugaskanKurir: pesananSlice.tugaskanKurir,
       ...kas,
       ...pengaturan,
       siapkanPaket,
       setStatusPesanan,
     }),
-    [komoditas, pesananSlice.pesanan, pesananSlice.tugaskanKurir, kas, pengaturan, siapkanPaket, setStatusPesanan],
-  );
+    [komoditas, pesananSlice.pesanan, kas, pengaturan, siapkanPaket, setStatusPesanan],  );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

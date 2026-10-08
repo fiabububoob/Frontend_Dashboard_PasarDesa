@@ -1,5 +1,6 @@
 "use client";
 
+import { FotoProduk } from "@/components/ui/FotoProduk";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { useDashboardData } from "@/components/providers/DashboardDataProvider";
@@ -94,7 +95,7 @@ export function PratinjauWargaContent({ data }: { data?: PengaturanLapak }) {
                     .map((k) => (
                       <li key={k.id} className="flex items-center justify-between gap-3 px-3 py-2">
                         <span className="flex min-w-0 items-center gap-2">
-                          <span className="text-lg">{k.gambar}</span>
+                          <FotoProduk nama={k.nama} foto={k.foto?.[0]} ikon={k.gambar} className="h-9 w-9 text-lg" />
                           <span className="min-w-0">
                             <span className="block truncate text-xs font-medium text-ink-900">{k.nama}</span>
                             <span className="block text-[11px] text-ink-400">per {k.satuan}</span>

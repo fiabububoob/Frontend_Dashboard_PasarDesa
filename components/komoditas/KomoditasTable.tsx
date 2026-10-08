@@ -1,5 +1,6 @@
 "use client";
 
+import { FotoProduk } from "@/components/ui/FotoProduk";
 import { Inbox, Pencil } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -56,9 +57,7 @@ export function KomoditasTable({
               <tr key={item.id} className="animate-fade-in" style={stagger(index)}>
                 <td className="px-5 py-4">
                   <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-muted text-lg">
-                      {item.gambar}
-                    </div>
+                    <FotoProduk nama={item.nama} foto={item.foto?.[0]} ikon={item.gambar} className="h-10 w-10 text-lg" />
                     <div>
                       <button
                         type="button"

@@ -1,5 +1,6 @@
 "use client";
 
+import { FotoProduk } from "@/components/ui/FotoProduk";
 import Link from "next/link";
 import { ExternalLink, Inbox } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
@@ -33,7 +34,7 @@ export function KategoriContent({ nama }: { nama: string }) {
               onClick={() => push({ type: "komoditas", id: k.id })}
               className="flex w-full items-center gap-3 rounded-lg border border-line p-3 text-left transition-colors duration-feedback ease-enter hover:bg-surface-muted"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-muted text-lg">{k.gambar}</span>
+              <FotoProduk nama={k.nama} foto={k.foto?.[0]} ikon={k.gambar} className="h-10 w-10 text-lg" />
               <span className="min-w-0 flex-1">
                 <span className="block truncate font-medium text-ink-900">{k.nama}</span>
                 <span className="block text-xs text-ink-500">

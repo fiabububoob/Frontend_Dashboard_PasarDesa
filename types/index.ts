@@ -6,6 +6,7 @@
 // respons API; komponen tidak perlu ditulis ulang karena hanya memakai tipe ini.
 // ---------------------------------------------------------------------------
 export * from "./ui";
+export * from "./kategori";
 export * from "./komoditas";
 export * from "./pesanan";
 export * from "./kas";

@@ -1,3 +1,4 @@
+import { indukDari } from "@/lib/kategori";
 import type { DetailTarget, Komoditas, Pesanan, TransaksiKas, Warta } from "@/types";
 import { kategoriList } from "@/lib/stok";
 import { STATUS_LABEL } from "@/lib/pesanan";
@@ -44,7 +45,7 @@ export function cari(query: string, data: { komoditas: Komoditas[]; pesanan: Pes
     }));
 
   const kategori: HasilCari[] = kategoriList(data.komoditas)
-    .filter((c) => cocokSemuaKata(q, c.nama))
+    .filter((c) => cocokSemuaKata(q, c.nama, indukDari(c.nama)?.nama))
     .map((c) => ({
       key: `kategori-${c.nama}`,
       grup: "Kategori",

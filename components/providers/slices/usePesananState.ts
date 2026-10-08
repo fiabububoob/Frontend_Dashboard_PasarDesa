@@ -27,9 +27,6 @@ export function usePesananState() {
     );
   }, []);
 
-  const tugaskanKurir = useCallback((id: string) => {
-    setPesanan((daftar) => daftar.map((p) => (p.id === id ? { ...p, kurir: KURIR_DEFAULT } : p)));
-  }, []);
 
-  return useMemo(() => ({ pesanan, cariPesanan, ubahStatus, tugaskanKurir }), [pesanan, cariPesanan, ubahStatus, tugaskanKurir]);
+  return useMemo(() => ({ pesanan, cariPesanan, ubahStatus }), [pesanan, cariPesanan, ubahStatus]);
 }

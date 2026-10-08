@@ -3,7 +3,7 @@ import { KOMODITAS_LIST } from "@/lib/data/komoditas";
 import { buatKomoditas, buatSkuBaru, kodeSku, tambahStokKomoditas, ubahKomoditas } from "@/lib/komoditas";
 import type { KomoditasBaru } from "@/types";
 
-const BARU: KomoditasBaru = { nama: "Kacang Tanah Kupas", gambar: "🥜", kategori: "Palawija & Jagung", asalBlok: "Blok A", harga: 28000, satuan: "kg", stok: 20, stokMaks: 40 };
+const BARU: KomoditasBaru = { nama: "Kacang Tanah Kupas", gambar: "🥜", kategori: "Dapur & Rumah", asalBlok: "Blok A", harga: 28000, satuan: "kg", stok: 20, stokMaks: 40 };
 
 describe("kodeSku", () => {
   it("mengambil tiga huruf pertama (huruf besar)", () => {
