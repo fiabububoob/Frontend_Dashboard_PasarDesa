@@ -10,51 +10,62 @@ import { Pagination } from "@/components/ui/Pagination";
 import { KomoditasTable } from "@/components/komoditas/KomoditasTable";
 import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { useDetail } from "@/components/detail/DetailProvider";
-import { KATEGORI_KOMODITAS } from "@/lib/data/komoditas";
+import { KATEGORI_INDUK } from "@/lib/data/kategori";
 import { usePaginasi } from "@/lib/hooks/usePaginasi";
+import { indukDari, subDariInduk } from "@/lib/kategori";
 import { statKomoditas } from "@/lib/stats";
 import { cocokSemuaKata } from "@/lib/text";
 import type { Komoditas } from "@/types";
 
-const SEMUA = "Semua Hasil Tani";
+const SEMUA = "Semua";
 
 type StatusFilter = "semua" | Komoditas["statusStok"];
 
 // Semua yang ada di halaman ini (statistik, filter, pencarian, paginasi, toggle)
 // dibaca dari data hidup, jadi menambah/mengubah komoditas langsung terlihat.
+// Filter kategori dua tingkat: pilih kategori besar dulu, lalu (opsional) sub-kategorinya.
 export function KomoditasWorkspace() {
   const { komoditas } = useDashboardData();
   const { open } = useDetail();
 
-  const [kategori, setKategori] = useState(SEMUA);
+  const [induk, setInduk] = useState(SEMUA);
+  const [sub, setSub] = useState<string | null>(null);
   const [status, setStatus] = useState<StatusFilter>("semua");
   const [query, setQuery] = useState("");
 
   const stats = useMemo(() => statKomoditas(komoditas), [komoditas]);
 
-  const filterKategori = useMemo(
-    () => [
-      { label: SEMUA, count: komoditas.length },
-      ...KATEGORI_KOMODITAS.map((nama) => ({ label: nama as string, count: komoditas.filter((k) => k.kategori === nama).length })),
-    ],
-    [komoditas],
-  );
+  const hitungSub = (nama: string) => komoditas.filter((k) => k.kategori === nama).length;
+  const hitungInduk = (nama: string) => subDariInduk(nama).reduce((total, s) => total + hitungSub(s), 0);
+
+  const opsiInduk = [{ label: SEMUA, count: komoditas.length }, ...KATEGORI_INDUK.map((i) => ({ label: i.nama, count: hitungInduk(i.nama) }))];
+
+  // Baris kedua (sub-kategori) hanya muncul bila kategori besar yang dipilih punya lebih dari satu sub.
+  const daftarSub = induk === SEMUA ? [] : subDariInduk(induk);
+  const labelSemuaSub = `Semua ${induk}`;
+  const opsiSub = [{ label: labelSemuaSub, count: hitungInduk(induk) }, ...daftarSub.map((nama) => ({ label: nama, count: hitungSub(nama) }))];
 
   const hasil = useMemo(
     () =>
       komoditas.filter((k) => {
-        if (kategori !== SEMUA && k.kategori !== kategori) return false;
+        if (sub !== null && k.kategori !== sub) return false;
+        if (sub === null && induk !== SEMUA && !subDariInduk(induk).includes(k.kategori)) return false;
         if (status !== "semua" && k.statusStok !== status) return false;
-        return cocokSemuaKata(query, k.nama, k.sku, k.kategori, k.asalBlok, k.tag, k.hargaKeterangan);
+        return cocokSemuaKata(query, k.nama, k.sku, k.kategori, indukDari(k.kategori)?.nama, k.asalBlok, k.tag, k.hargaKeterangan);
       }),
-    [komoditas, kategori, status, query],
+    [komoditas, induk, sub, status, query],
   );
 
-  const { halaman, totalHalaman, itemHalaman: tampil, setHalaman } = usePaginasi(hasil, `${kategori}|${status}|${query}`);
-  const adaFilter = kategori !== SEMUA || status !== "semua" || query.trim() !== "";
+  const { halaman, totalHalaman, itemHalaman: tampil, setHalaman } = usePaginasi(hasil, `${induk}|${sub}|${status}|${query}`);
+  const adaFilter = induk !== SEMUA || status !== "semua" || query.trim() !== "";
+
+  function pilihInduk(label: string) {
+    setInduk(label);
+    setSub(null); // ganti kategori besar → sub-kategori di-reset
+  }
 
   function reset() {
-    setKategori(SEMUA);
+    pilihInduk(SEMUA);
     setStatus("semua");
     setQuery("");
   }
@@ -81,7 +92,8 @@ export function KomoditasWorkspace() {
       <StatCardGrid stats={stats} />
 
       <div className="space-y-3">
-        <FilterPills options={filterKategori} active={kategori} onChange={setKategori} />
+        <FilterPills options={opsiInduk} active={induk} onChange={pilihInduk} />
+        {daftarSub.length > 1 && <FilterPills options={opsiSub} active={sub ?? labelSemuaSub} onChange={(label) => setSub(label === labelSemuaSub ? null : label)} />}
 
         <div className="flex flex-col gap-2 sm:flex-row">
           <div className="relative flex-1 sm:max-w-sm">

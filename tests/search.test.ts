@@ -19,9 +19,10 @@ describe("cari", () => {
     const hasil = cari("joko", DATA).find((h) => h.grup === "Pesanan");
     expect(hasil?.target).toEqual({ type: "pesanan", id: "PSD-20231024-0089" });
   });
-  it("menemukan kategori", () => {
+  it("menemukan sub-kategori lewat nama sub maupun nama kategori besarnya", () => {
+    expect(cari("telur", DATA).some((h) => h.grup === "Kategori")).toBe(true);
     expect(cari("ternak", DATA).some((h) => h.grup === "Kategori")).toBe(true);
-  });
+  });   
   it("membatasi jumlah hasil per grup", () => {
     const perGrup = cari("a", DATA).filter((h) => h.grup === "Pesanan");
     expect(perGrup.length).toBeLessThanOrEqual(5);

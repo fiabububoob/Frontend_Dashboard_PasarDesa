@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { downloadCsv, parseCsv } from "@/lib/csv";
-import { IKON_KATEGORI, KATEGORI_KOMODITAS } from "@/lib/data/komoditas";
-import { useDetail } from "./DetailProvider";
+import { IKON_BAWAAN, IKON_SUB_KATEGORI, NAMA_SUB_KATEGORI } from "@/lib/kategori";import { useDetail } from "./DetailProvider";
 import type { KomoditasBaru } from "@/types";
 
 const KOLOM = ["nama", "kategori", "asalBlok", "harga", "satuan", "stok", "stokMaks"] as const;
@@ -35,16 +34,16 @@ function bacaCsv(teks: string): Hasil | { error: string } {
     const harga = Number(v("harga"));
     const stok = Number(v("stok"));
     const stokMaks = Number(v("stokMaks"));
-    const kategori = KATEGORI_KOMODITAS.find((k) => k.toLowerCase() === v("kategori").toLowerCase());
+    const kategori = NAMA_SUB_KATEGORI.find((k) => k.toLowerCase() === v("kategori").toLowerCase());
 
     if (v("nama").length < 3) return masalah.push(`Baris ${baris}: nama minimal 3 karakter`);
-    if (!kategori) return masalah.push(`Baris ${baris}: kategori harus salah satu dari ${KATEGORI_KOMODITAS.join(" / ")}`);
+    if (!kategori) return masalah.push(`Baris ${baris}: kategori harus salah satu dari ${NAMA_SUB_KATEGORI.join(" / ")}`);
     if (!v("asalBlok") || !v("satuan")) return masalah.push(`Baris ${baris}: asalBlok dan satuan wajib diisi`);
     if (![harga, stok, stokMaks].every((n) => Number.isFinite(n)) || harga <= 0 || stok < 0 || stokMaks <= 0)
       return masalah.push(`Baris ${baris}: harga, stok, dan stokMaks harus angka yang valid`);
     if (stok > stokMaks) return masalah.push(`Baris ${baris}: stok melebihi kapasitas`);
 
-    valid.push({ nama: v("nama"), kategori, gambar: IKON_KATEGORI[kategori] ?? "🌱", asalBlok: v("asalBlok"), harga, satuan: v("satuan"), stok, stokMaks });
+    valid.push({ nama: v("nama"), kategori, gambar: IKON_SUB_KATEGORI[kategori] ?? IKON_BAWAAN, asalBlok: v("asalBlok"), harga, satuan: v("satuan"), stok, stokMaks });
   });
   return { valid, masalah };
 }
@@ -69,7 +68,7 @@ export function ImporEksporContent() {
   function unduhTemplate() {
     downloadCsv("template-impor-komoditas.csv", [
       [...KOLOM],
-      ["Kacang Tanah Kupas 1kg", "Palawija & Jagung", "Blok Sawah Timur (RT 04)", 28000, "kg", 20, 40],
+      ["Kacang Tanah Kupas 1kg", "Dapur & Rumah", "Blok Sawah Timur (RT 04)", 28000, "kg", 20, 40],
     ]);
   }
 

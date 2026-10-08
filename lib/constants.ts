@@ -18,7 +18,14 @@ export const LATENSI = { cepat: 600, normal: 900, lambat: 1400 } as const;
 /** Jeda singkat sebelum modal menutup sendiri setelah form berhasil disimpan. */
 export const TUTUP_MODAL_SETELAH_SIMPAN_MS = 500;
 
+/** Foto profil pengguna. */
 export const MAKS_UKURAN_FOTO_BYTES = 2 * 1024 * 1024;
+
+/** Foto produk: jumlah per produk, ukuran file asli yang diterima, lalu diperkecil sebelum disimpan. */
+export const MAKS_FOTO_PRODUK = 5;
+export const MAKS_UKURAN_FOTO_PRODUK_BYTES = 5 * 1024 * 1024;
+export const MAKS_SISI_FOTO_PX = 1280;
+export const KUALITAS_FOTO = 0.82;
 
 /** Kloter jemput kurir desa sore hari. */
 export const JAM_JEMPUT_SORE = "15:00 WIB";

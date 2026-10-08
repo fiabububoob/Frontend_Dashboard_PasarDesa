@@ -1,21 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { clsx } from "clsx";
-import { ChevronDown, Headset, Store, UserRound, type LucideIcon } from "lucide-react";
+import { ChevronDown, UserRound } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar";
 import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { useDetail } from "@/components/detail/DetailProvider";
-import type { DetailTarget } from "@/types";
 import { Popover } from "./Popover";
-
-const ITEM_CLASS =
-  "flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left text-sm text-ink-700 transition-colors duration-feedback ease-enter hover:bg-surface-muted";
-
-const AKSI_MODAL: { icon: LucideIcon; label: string; target: DetailTarget }[] = [
-  { icon: UserRound, label: "Edit Profil", target: { type: "profil" } },
-  { icon: Headset, label: "Hubungi CS", target: { type: "hotline" } },
-];
 
 export function ProfileMenu() {
   const { profil, pengaturan } = useDashboardData();
@@ -53,25 +43,18 @@ export function ProfileMenu() {
             </div>
           </div>
           <div className="my-1 border-t border-line" />
-          {AKSI_MODAL.map(({ icon: Icon, label, target }) => (
-            <button
-              key={label}
-              type="button"
-              role="menuitem"
-              onClick={() => {
-                open(target);
-                tutup();
-              }}
-              className={ITEM_CLASS}
-            >
-              <Icon className="h-4 w-4 text-ink-400" aria-hidden />
-              {label}
-            </button>
-          ))}
-          <Link href="/pengaturan" role="menuitem" onClick={tutup} className={ITEM_CLASS}>
-            <Store className="h-4 w-4 text-ink-400" aria-hidden />
-            Pengaturan
-          </Link>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              open({ type: "profil" });
+              tutup();
+            }}
+            className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left text-sm text-ink-700 transition-colors duration-feedback ease-enter hover:bg-surface-muted"
+          >
+            <UserRound className="h-4 w-4 text-ink-400" aria-hidden />
+            Edit Profil
+          </button>
         </div>
       )}
     </Popover>

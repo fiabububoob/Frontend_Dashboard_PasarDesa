@@ -1,5 +1,6 @@
 "use client";
 
+import { FotoProduk } from "@/components/ui/FotoProduk";
 import Link from "next/link";
 import { ExternalLink, Pencil, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
@@ -23,7 +24,7 @@ export function KomoditasContent({ id }: { id: string }) {
   return (
     <div className="space-y-4 text-sm">
       <div className="flex items-center gap-3">
-        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-surface-muted text-3xl">{k.gambar}</div>
+        <FotoProduk nama={k.nama} foto={k.foto?.[0]} ikon={k.gambar} className="h-14 w-14 text-3xl" />
         <div className="space-y-1.5">
           <button
             type="button"

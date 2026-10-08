@@ -5,11 +5,11 @@ import { Field } from "@/components/ui/Field";
 import { FormActions } from "@/components/ui/FormActions";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { FotoUploader } from "@/components/komoditas/FotoUploader";
 import { useDashboardData } from "@/components/providers/DashboardDataProvider";
-import { IKON_KATEGORI, KATEGORI_KOMODITAS } from "@/lib/data/komoditas";
+import { KATEGORI_INDUK } from "@/lib/data/kategori";
+import { IKON_BAWAAN, IKON_SUB_KATEGORI, NAMA_SUB_KATEGORI, SUB_KATEGORI } from "@/lib/kategori";
 import { useSimpanModal } from "./useSimpanModal";
-
-const IKON_BAWAAN = "🌱";
 
 // Satu form untuk dua mode: tambah komoditas baru (tanpa id) dan ubah data
 // komoditas yang sudah ada (dengan id).
@@ -18,10 +18,12 @@ export function KomoditasForm({ id }: { id?: string }) {
   const { status, close, simpan } = useSimpanModal("Gagal menyimpan komoditas");
 
   const awal = id ? komoditas.find((k) => k.id === id) : undefined;
+  const kategoriAwal = awal?.kategori ?? SUB_KATEGORI[0].nama;
 
+  const [foto, setFoto] = useState<string[]>(awal?.foto ?? []);
   const [nama, setNama] = useState(awal?.nama ?? "");
-  const [kategori, setKategori] = useState<string>(awal?.kategori ?? KATEGORI_KOMODITAS[0]);
-  const [gambar, setGambar] = useState(awal?.gambar ?? IKON_KATEGORI[KATEGORI_KOMODITAS[0]]);
+  const [kategori, setKategori] = useState(kategoriAwal);
+  const [gambar, setGambar] = useState(awal?.gambar ?? IKON_SUB_KATEGORI[kategoriAwal] ?? IKON_BAWAAN);
   const [ikonDipilihSendiri, setIkonDipilihSendiri] = useState(Boolean(awal));
   const [asalBlok, setAsalBlok] = useState(awal?.asalBlok ?? "");
   const [harga, setHarga] = useState(awal ? String(awal.harga) : "");
@@ -34,13 +36,13 @@ export function KomoditasForm({ id }: { id?: string }) {
   if (id && !awal) return <p className="text-sm text-ink-500">Komoditas tidak ditemukan.</p>;
 
   const stokError = stok !== "" && stokMaks !== "" && Number(stok) > Number(stokMaks) ? "Stok tidak boleh melebihi kapasitas" : undefined;
-  // Kategori lama di luar daftar baku tetap bisa dipilih agar data yang sudah ada tidak berubah diam-diam.
-  const kategoriLama = awal && !(KATEGORI_KOMODITAS as readonly string[]).includes(awal.kategori) ? awal.kategori : undefined;
+  // Kategori lama di luar pohon kategori tetap bisa dipilih agar data yang sudah ada tidak berubah diam-diam.
+  const kategoriLama = awal && !NAMA_SUB_KATEGORI.includes(awal.kategori) ? awal.kategori : undefined;
 
   function pilihKategori(nilai: string) {
     setKategori(nilai);
-    // Ikon ikut kategori selama pengguna belum memilih ikon sendiri.
-    if (!ikonDipilihSendiri) setGambar(IKON_KATEGORI[nilai] ?? IKON_BAWAAN);
+    // Ikon cadangan ikut kategori selama pengguna belum memilih ikon sendiri.
+    if (!ikonDipilihSendiri) setGambar(IKON_SUB_KATEGORI[nilai] ?? IKON_BAWAAN);
   }
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -48,6 +50,7 @@ export function KomoditasForm({ id }: { id?: string }) {
     if (stokError) return;
     const data = {
       nama: nama.trim(),
+      foto,
       kategori,
       gambar: gambar.trim() || IKON_BAWAAN,
       asalBlok: asalBlok.trim(),
@@ -70,6 +73,8 @@ export function KomoditasForm({ id }: { id?: string }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 text-sm">
+      <FotoUploader foto={foto} onChange={setFoto} />
+
       <Field label="Nama komoditas" htmlFor="kmd-nama">
         <Input id="kmd-nama" required minLength={3} value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Contoh: Beras Merah Organik 5kg" />
       </Field>
@@ -77,15 +82,19 @@ export function KomoditasForm({ id }: { id?: string }) {
       <div className="grid grid-cols-[1fr_5rem] gap-3">
         <Field label="Kategori" htmlFor="kmd-kategori">
           <Select id="kmd-kategori" value={kategori} onChange={(e) => pilihKategori(e.target.value)}>
-            {KATEGORI_KOMODITAS.map((k) => (
-              <option key={k} value={k}>
-                {k}
-              </option>
+            {KATEGORI_INDUK.map((induk) => (
+              <optgroup key={induk.id} label={induk.nama}>
+                {induk.anak.map((sub) => (
+                  <option key={sub.id} value={sub.nama}>
+                    {sub.nama}
+                  </option>
+                ))}
+              </optgroup>
             ))}
             {kategoriLama && <option value={kategoriLama}>{kategoriLama}</option>}
           </Select>
         </Field>
-        <Field label="Ikon" htmlFor="kmd-ikon">
+        <Field label="Ikon cadangan" htmlFor="kmd-ikon">
           <Input
             id="kmd-ikon"
             maxLength={4}
