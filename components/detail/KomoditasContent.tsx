@@ -11,10 +11,14 @@ import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { cariKomoditasByNama } from "@/lib/stok";
 import { formatRupiah } from "@/lib/format";
 import { useDetail } from "./DetailProvider";
+import { useSekarang } from "@/lib/hooks/useSekarang";
+import { labelBadge, waktuPanenLabel } from "@/lib/komoditas";
 
 export function KomoditasContent({ id }: { id: string }) {
   const { komoditas, pesanan } = useDashboardData();
   const { push } = useDetail();
+  const sekarang = useSekarang();
+
   const k = komoditas.find((x) => x.id === id);
 
   if (!k) return <p className="text-sm text-ink-500">Komoditas tidak ditemukan.</p>;
@@ -34,6 +38,11 @@ export function KomoditasContent({ id }: { id: string }) {
             {k.kategori} →
           </button>
           <div className="flex flex-wrap gap-1.5">
+            {k.badge?.map((kode) => (
+              <Badge key={kode} tone="success">
+                {labelBadge(kode)}
+              </Badge>
+            ))}
             {k.tag && <Badge tone="info">{k.tag}</Badge>}
             <Badge tone={k.tampil ? "success" : "neutral"}>{k.tampil ? "Tampil di aplikasi" : "Disembunyikan"}</Badge>
           </div>
@@ -44,13 +53,14 @@ export function KomoditasContent({ id }: { id: string }) {
         <div>
           <dt className="text-xs text-ink-500">Harga</dt>
           <dd className="font-medium text-ink-900">
-            {formatRupiah(k.harga)} <span className="text-xs font-normal text-ink-400">/ {k.satuan}</span>
+            {formatRupiah(k.harga)} <span className="text-xs font-normal text-ink-400">/ {k.satuan}{k.ukuran ? ` (${k.ukuran})` : ""}</span>
+            {k.hargaCoret && <span className="ml-1.5 text-xs font-normal text-ink-400 line-through">{formatRupiah(k.hargaCoret)}</span>}
           </dd>
           {k.hargaKeterangan && <dd className="text-xs text-ink-400">{k.hargaKeterangan}</dd>}
         </div>
         <div>
           <dt className="text-xs text-ink-500">Waktu Panen</dt>
-          <dd className="font-medium text-ink-900">{k.waktuPanen}</dd>
+          <dd className="font-medium text-ink-900">{sekarang ? waktuPanenLabel(k, sekarang) : k.waktuPanen}</dd>
           {k.waktuKeterangan && <dd className="text-xs text-ink-400">{k.waktuKeterangan}</dd>}
         </div>
         <div className="col-span-2">
@@ -60,6 +70,24 @@ export function KomoditasContent({ id }: { id: string }) {
           </dd>
         </div>
       </dl>
+
+      {(k.deskripsi || k.spesifikasi?.length || k.saranPenyimpanan) && (
+        <div className="space-y-3 border-t border-line pt-4">
+          <p className="text-xs font-medium uppercase text-ink-400">Detail untuk pembeli</p>
+          {k.deskripsi && <p className="text-ink-700">{k.deskripsi}</p>}
+          {k.spesifikasi && k.spesifikasi.length > 0 && (
+            <dl className="divide-y divide-line rounded-lg border border-line text-xs">
+              {k.spesifikasi.map((s) => (
+                <div key={s.label} className="flex justify-between gap-4 px-3 py-2">
+                  <dt className="text-ink-500">{s.label}</dt>
+                  <dd className="text-right font-medium text-ink-900">{s.nilai}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+          {k.saranPenyimpanan && <p className="rounded-lg bg-warn-50 p-3 text-xs text-warn-600">💡 {k.saranPenyimpanan}</p>}
+        </div>
+      )}
 
       {terkait.length > 0 && (
         <div>

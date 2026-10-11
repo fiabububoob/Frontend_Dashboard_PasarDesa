@@ -97,8 +97,8 @@ function describe(t: DetailTarget, data: ReturnType<typeof useDashboardData>): {
     case "form-komoditas": {
       const k = t.id ? data.komoditas.find((x) => x.id === t.id) : undefined;
       return k
-        ? { title: "Ubah Komoditas", subtitle: `SKU: ${k.sku}` }
-        : { title: "Tambah Komoditas Panen", subtitle: "Komoditas baru langsung muncul di katalog warga." };
+        ? { title: "Ubah Komoditas", subtitle: `SKU: ${k.sku}`, size: "lg" }
+        : { title: "Tambah Komoditas Panen", subtitle: "Komoditas baru langsung muncul di katalog warga.", size: "lg" };
     }
     case "impor-ekspor":
       return { title: "Import / Ekspor Data", subtitle: "Pindahkan data komoditas lewat file CSV" };

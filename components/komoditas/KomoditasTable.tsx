@@ -11,6 +11,8 @@ import { StockBar } from "./StockBar";
 import { formatRupiah } from "@/lib/format";
 import { useDetail } from "@/components/detail/DetailProvider";
 import type { Komoditas } from "@/types";
+import { useSekarang } from "@/lib/hooks/useSekarang"; 
+import { waktuPanenLabel } from "@/lib/komoditas";
 
 interface KomoditasTableProps {
   data: Komoditas[];
@@ -24,6 +26,7 @@ export function KomoditasTable({
   emptyDescription = "Tambahkan hasil panen pertama agar bisa dipesan warga Sukorejo.",
 }: KomoditasTableProps) {
   const { open } = useDetail();
+  const sekarang = useSekarang();
 
   if (data.length === 0) {
     return (
@@ -87,6 +90,7 @@ export function KomoditasTable({
                   <p className="font-medium text-ink-900">
                     {formatRupiah(item.harga)}
                     <span className="text-xs font-normal text-ink-400"> / {item.satuan}</span>
+                    {item.hargaCoret && <span className="ml-1.5 text-xs font-normal text-ink-400 line-through">{formatRupiah(item.hargaCoret)}</span>}
                   </p>
                   {item.hargaKeterangan && <p className="text-xs text-ink-400">{item.hargaKeterangan}</p>}
                 </td>
@@ -94,7 +98,7 @@ export function KomoditasTable({
                   <StockBar komoditas={item} />
                 </td>
                 <td className="px-3 py-4 text-ink-700">
-                  <p className="font-medium text-ink-900">{item.waktuPanen}</p>
+                  <p className="font-medium text-ink-900">{sekarang ? waktuPanenLabel(item, sekarang) : item.waktuPanen}</p>
                   {item.waktuKeterangan && <p className="text-xs text-ink-400">{item.waktuKeterangan}</p>}
                 </td>
                 <td className="px-3 py-4">

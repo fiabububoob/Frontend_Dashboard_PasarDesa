@@ -27,6 +27,11 @@ export const MAKS_UKURAN_FOTO_PRODUK_BYTES = 5 * 1024 * 1024;
 export const MAKS_SISI_FOTO_PX = 1280;
 export const KUALITAS_FOTO = 0.82;
 
+/** Batas isian detail produk. */
+export const MAKS_SPESIFIKASI = 8;
+export const MAKS_DESKRIPSI = 600;
+export const MAKS_SARAN_PENYIMPANAN = 200;
+
 /** Kloter jemput kurir desa sore hari. */
 export const JAM_JEMPUT_SORE = "15:00 WIB";
 

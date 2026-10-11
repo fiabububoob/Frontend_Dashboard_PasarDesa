@@ -30,6 +30,19 @@ export const KOMODITAS_LIST: Komoditas[] = [
     waktuKeterangan: "Baru Selesai Giling",
     tampil: true,
     tag: "Sertifikasi BUMDes",
+    ukuran: "5 kg",
+    hargaCoret: 72000,
+    badge: ["panen-baru", "sertifikasi-bumdes"],
+    deskripsi:
+      "Beras asli hasil panen kelompok tani Desa Sukorejo musim tanam pertama. Karakteristik beras pulen dengan aroma wangi pandan yang khas. Dikemas higienis di lumbung modern BUMDes tanpa proses penggilingan berulang.",
+    spesifikasi: [
+      { label: "Berat Bersih", nilai: "5 Kilogram" },
+      { label: "Asal Panen", nilai: "Sawah Blok Selatan Sukorejo" },
+      { label: "Kualitas Pengolahan", nilai: "Tanpa Pemutih & Pengawet" },
+      { label: "Varietas Bibit", nilai: "Pandan Wangi Bersertifikat" },
+    ],
+    saranPenyimpanan:
+      "Simpan di tempat kering dan tertutup rapat, jauhkan dari sinar matahari langsung agar aroma tetap terjaga hingga 3 bulan.",
   },
   {
     id: "SKR-JGN-01",
@@ -48,6 +61,8 @@ export const KOMODITAS_LIST: Komoditas[] = [
     waktuKeterangan: "Kondisi Tongkol Segar",
     tampil: true,
     tag: "Bebas Pestisida",
+    ukuran: "1 kg",
+    badge: ["segar-harian"],
   },
   {
     id: "SKR-CBI-05",
@@ -66,6 +81,9 @@ export const KOMODITAS_LIST: Komoditas[] = [
     waktuKeterangan: "Petik Subuh Langsung",
     tampil: true,
     tag: "Permintaan Tinggi",
+    ukuran: "500 g",
+    hargaCoret: 25000,
+    badge: ["segar-harian", "favorit"],
   },
   {
     id: "SKR-BWG-01",
@@ -225,5 +243,3 @@ export const KOMODITAS_LIST: Komoditas[] = [
     tampil: true,
   },
 ];
-
-

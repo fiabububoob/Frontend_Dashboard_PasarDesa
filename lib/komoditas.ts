@@ -1,4 +1,6 @@
-import type { Komoditas, KomoditasBaru, KomoditasUbah } from "@/types";
+import type { BadgeProduk, Komoditas, KomoditasBaru, KomoditasUbah } from "@/types";
+import { BADGE_PRODUK } from "./data/badgeProduk";
+import { formatTanggal, isoTanggal } from "./format";
 import { hitungStatusStok } from "./stok";
 
 // Aturan bisnis komoditas sebagai fungsi murni (tanpa React): dipakai oleh
@@ -38,9 +40,17 @@ export function buatKomoditas(daftar: Komoditas[], data: KomoditasBaru): Komodit
 }
 
 // Stok tidak pernah melebihi kapasitas; status stok ikut dihitung ulang.
-export function tambahStokKomoditas(k: Komoditas, jumlah: number, catatan?: string): Komoditas {
+// Mencatat panen berarti tanggal panen terbaru = hari ini.
+export function tambahStokKomoditas(k: Komoditas, jumlah: number, catatan?: string, sekarang: Date = new Date()): Komoditas {
   const stok = Math.min(k.stok + jumlah, k.stokMaks);
-  return { ...k, stok, statusStok: hitungStatusStok(stok, k.stokMaks), waktuPanen: "Baru saja", waktuKeterangan: catatan ?? "Dicatat dari Ringkasan" };
+  return {
+    ...k,
+    stok,
+    statusStok: hitungStatusStok(stok, k.stokMaks),
+    waktuPanen: "Baru saja",
+    tanggalPanen: isoTanggal(sekarang),
+    waktuKeterangan: catatan ?? "Dicatat dari Ringkasan",
+  };
 }
 
 export function ubahKomoditas(k: Komoditas, data: KomoditasUbah): Komoditas {
@@ -49,3 +59,30 @@ export function ubahKomoditas(k: Komoditas, data: KomoditasUbah): Komoditas {
   hasil.statusStok = hitungStatusStok(hasil.stok, hasil.stokMaks);
   return hasil;
 }
+
+// ---------------------------------------------------------------------------
+// Label waktu panen & badge
+// ---------------------------------------------------------------------------
+const MS_PER_HARI = 86_400_000;
+const BATAS_HARI_RELATIF = 14;
+
+/** Selisih hari kalender antara dua tanggal ISO (isoA - isoB). */
+export function selisihHari(isoA: string, isoB: string): number {
+  return Math.round((Date.parse(isoA) - Date.parse(isoB)) / MS_PER_HARI);
+}
+
+const tanggalDariIso = (iso: string) => formatTanggal(new Date(`${iso}T00:00:00+07:00`));
+
+// "Hari ini", "Kemarin", "5 hari lalu", atau tanggal lengkap bila sudah lama. Produk lama yang
+// belum punya tanggalPanen tetap memakai teks bebas `waktuPanen`.
+export function waktuPanenLabel(k: Pick<Komoditas, "tanggalPanen" | "waktuPanen">, sekarang: Date): string {
+  if (!k.tanggalPanen) return k.waktuPanen;
+  const hariLalu = selisihHari(isoTanggal(sekarang), k.tanggalPanen);
+  if (hariLalu < 0) return `Dijadwalkan ${tanggalDariIso(k.tanggalPanen)}`;
+  if (hariLalu === 0) return "Hari ini";
+  if (hariLalu === 1) return "Kemarin";
+  if (hariLalu < BATAS_HARI_RELATIF) return `${hariLalu} hari lalu`;
+  return tanggalDariIso(k.tanggalPanen);
+}
+
+export const labelBadge = (kode: BadgeProduk): string => BADGE_PRODUK.find((b) => b.kode === kode)?.label ?? kode;
