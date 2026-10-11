@@ -10,6 +10,7 @@ import { formatRupiah } from "@/lib/format";
 import { jadwalHariIni } from "@/lib/pengaturan";
 import { AMBANG_KRITIS } from "@/lib/stok";
 import type { PengaturanLapak } from "@/types";
+import { labelBadge } from "@/lib/komoditas";
 
 // Tampilan lapak seperti yang dilihat warga di aplikasi PasarDesa. Memakai
 // draft yang dikirim dari form (bila ada) supaya perubahan yang belum
@@ -98,11 +99,22 @@ export function PratinjauWargaContent({ data }: { data?: PengaturanLapak }) {
                           <FotoProduk nama={k.nama} foto={k.foto?.[0]} ikon={k.gambar} className="h-9 w-9 text-lg" />
                           <span className="min-w-0">
                             <span className="block truncate text-xs font-medium text-ink-900">{k.nama}</span>
-                            <span className="block text-[11px] text-ink-400">per {k.satuan}</span>
+                            {k.badge && k.badge.length > 0 && (
+                              <span className="block truncate text-[10px] font-semibold uppercase text-brand-600">
+                                {k.badge.map(labelBadge).join(" · ")}
+                              </span>
+                            )}
+                            <span className="block text-[11px] text-ink-400">
+                              per {k.satuan}
+                              {k.ukuran ? ` · ${k.ukuran}` : ""}
+                            </span>
                           </span>
                         </span>
                         <span className="shrink-0 text-right">
                           <span className="block text-xs font-semibold text-ink-900">{formatRupiah(k.harga)}</span>
+                          {k.hargaCoret && (
+                            <span className="block text-[11px] text-ink-400 line-through">{formatRupiah(k.hargaCoret)}</span>
+                          )}
                           {k.stok < AMBANG_KRITIS ? <Badge tone="danger">Stok menipis</Badge> : null}
                         </span>
                       </li>

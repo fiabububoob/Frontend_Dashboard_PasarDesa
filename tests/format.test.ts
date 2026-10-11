@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatJam, formatRupiah, waLink, waktuWib } from "@/lib/format";
+import { formatJam, formatRupiah, isoTanggal, waLink, waktuWib } from "@/lib/format";
 
 describe("formatRupiah", () => {
   it("memakai pemisah ribuan titik dan satu spasi setelah Rp", () => {
@@ -27,5 +27,12 @@ describe("jam WIB", () => {
   });
   it("waktuWib menambahkan zona", () => {
     expect(waktuWib(siang)).toBe("14:05 WIB");
+  });
+});
+
+describe("isoTanggal", () => {
+  it("memakai tanggal kalender WIB, bukan UTC", () => {
+    expect(isoTanggal(new Date("2023-10-23T17:30:00Z"))).toBe("2023-10-24"); // 00:30 WIB
+    expect(isoTanggal(new Date("2023-10-23T16:30:00Z"))).toBe("2023-10-23"); // 23:30 WIB
   });
 });

@@ -23,6 +23,11 @@ export function formatTanggal(date: Date, gaya: "full" | "long" = "long"): strin
   return new Intl.DateTimeFormat(LOCALE, { dateStyle: gaya, timeZone: ZONA_WAKTU }).format(date);
 }
 
+// Tanggal WIB berformat ISO "YYYY-MM-DD" (locale en-CA memang berformat ini). Dipakai untuk tanggal panen.
+export function isoTanggal(date: Date): string {
+  return new Intl.DateTimeFormat("en-CA", { year: "numeric", month: "2-digit", day: "2-digit", timeZone: ZONA_WAKTU }).format(date);
+}
+
 // Jam dalam WIB, mis. "14:05" atau "14:05:33". Intl id-ID memakai titik sebagai pemisah → diganti titik dua.
 export function formatJam(date: Date, denganDetik = false): string {
   const jam = new Intl.DateTimeFormat(LOCALE, {
