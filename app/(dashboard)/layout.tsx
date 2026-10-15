@@ -1,13 +1,19 @@
+import { redirect } from "next/navigation";
+import type { ReactNode } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
 import { AppProviders } from "@/components/providers/AppProviders";
+import { getUser } from "@/lib/server/session";
 
-// Every route inside app/(dashboard)/ automatically gets this shell —
-// Sidebar + Topbar + a scrollable content area, plus the toast & confirm-dialog
-// providers (useToast / useConfirm) yang bisa dipakai di semua halaman.
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+// Setiap route di dalam app/(dashboard)/ otomatis memakai kerangka ini —
+// Sidebar + Topbar + area konten yang bisa di-scroll, plus provider toast & dialog konfirmasi.
+// Layout ini juga gerbang login: token tidak valid/kedaluwarsa → /sesi-berakhir (hapus cookie) → /login.
+export default async function DashboardLayout({ children }: { children: ReactNode }) {
+  const user = await getUser();
+  if (!user) redirect("/sesi-berakhir");
+
   return (
-    <AppProviders>
+    <AppProviders profilAwal={{ nama: user.nama, jabatan: user.jabatan, foto: user.foto }}>
       <div className="flex h-screen overflow-hidden bg-surface">
         <Sidebar />
         <div className="flex flex-1 flex-col overflow-hidden">

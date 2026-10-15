@@ -6,6 +6,7 @@ import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { useDetail } from "@/components/detail/DetailProvider";
 import { ONGKIR_FLAT, SUBSIDI_ONGKIR } from "@/lib/constants";
 import { formatRupiah } from "@/lib/format";
+import { LABEL_METODE_BAYAR, sudahLunas } from "@/lib/pesanan";
 import { cariKomoditasByNama } from "@/lib/stok";
 import type { Pesanan } from "@/types";
 
@@ -55,10 +56,16 @@ export function RincianPesanan({ pesanan }: { pesanan: Pesanan }) {
 
       <div className="space-y-1.5 text-sm">
         <BarisBiaya label="Subtotal Hasil Panen" nilai={formatRupiah(subtotal)} />
-        <BarisBiaya label="Subsidi Ongkir Logistik Desa (BUMDes Berdaya)" nilai={`- ${formatRupiah(SUBSIDI_ONGKIR)}`} className="text-brand-600" />
-        <BarisBiaya label="Ongkir Kurir Desa Sukorejo (Flat Dusun)" nilai={formatRupiah(ONGKIR_FLAT)} />
+        {pesanan.opsiPengiriman === "kurir-desa" ? (
+          <>
+            <BarisBiaya label="Subsidi Ongkir Logistik Desa (BUMDes Berdaya)" nilai={`- ${formatRupiah(SUBSIDI_ONGKIR)}`} className="text-brand-600" />
+            <BarisBiaya label="Ongkir Kurir Desa Sukorejo (Flat Dusun)" nilai={formatRupiah(ONGKIR_FLAT)} />
+          </>
+        ) : (
+          <BarisBiaya label="Ongkir (ambil mandiri di pos)" nilai={formatRupiah(0)} />
+        )}
         <div className="flex justify-between border-t border-line pt-2 text-base font-semibold text-ink-900">
-          <span>{pesanan.metodeBayar === "QRIS" ? "Total Pembayaran Lunas" : "Total Dibayar di Tempat (COD)"}</span>
+          <span>{sudahLunas(pesanan) ? `Total Pembayaran Lunas (${LABEL_METODE_BAYAR[pesanan.metodeBayar]})` : pesanan.metodeBayar === "COD" ? "Total Dibayar di Tempat (COD)" : "Total Tagihan"}</span>
           <span className="text-brand-600">{formatRupiah(pesanan.total)}</span>
         </div>
       </div>

@@ -2,8 +2,8 @@
 
 import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { formatRupiah, formatTanggal } from "@/lib/format";
-import { STATUS_LABEL } from "@/lib/pesanan";
 import { PrintActions } from "./PrintActions";
+import { LABEL_METODE_BAYAR, STATUS_LABEL, sudahLunas } from "@/lib/pesanan";
 
 // Nota pembelian + label tempel untuk drop-point. Hanya area .print-area yang
 // tercetak (lihat @media print di globals.css); label diberi halaman sendiri

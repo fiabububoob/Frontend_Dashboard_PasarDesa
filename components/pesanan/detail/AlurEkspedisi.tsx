@@ -1,13 +1,17 @@
-import { CheckCircle2 } from "lucide-react";
-import type { StatusKemas } from "@/types";
+import { CheckCircle2, XCircle } from "lucide-react";
+import type { StatusPesanan } from "@/types";
 
 const LANGKAH = ["Diterima", "Sedang Dikemas", "Kurir Menjemput", "Drop-Point Diambil"];
 
 // Indeks langkah yang sedang berjalan untuk tiap status (selesai = semua langkah tuntas).
-const LANGKAH_AKTIF: Record<StatusKemas, number> = {
+// Pesanan ambil mandiri melewati "diantar", tetapi stepper tetap sama agar mudah dibaca.
+const LANGKAH_AKTIF: Record<Exclude<StatusPesanan, "dibatalkan">, number> = {
+  "menunggu-pembayaran": 0,
   "perlu-dikemas": 1,
   "siap-jemput": 2,
-  "sedang-dikemas": 3,
+  diantar: 3,
+  "tiba-di-pos": 4,
+  komplain: 4, // paket sudah di pos; menunggu komplain selesai sebelum diterima
   selesai: LANGKAH.length,
 };
 
@@ -20,7 +24,16 @@ function warnaLangkah(index: number, aktif: number) {
 }
 
 // Stepper 4 langkah: lingkaran berubah warna & isi (angka → centang) mengikuti status.
-export function AlurEkspedisi({ status }: { status: StatusKemas }) {
+// Pesanan yang dibatalkan menampilkan pemberitahuan merah, bukan stepper.
+export function AlurEkspedisi({ status }: { status: StatusPesanan }) {
+  if (status === "dibatalkan") {
+    return (
+      <div role="status" className="flex items-center gap-2 rounded-lg bg-danger-50 p-3 text-sm font-medium text-danger-600">
+        <XCircle className="h-4 w-4 shrink-0" aria-hidden />
+        Pesanan ini dibatalkan. Tidak ada yang perlu dikemas.
+      </div>
+    );
+  }
   const aktif = LANGKAH_AKTIF[status];
 
   return (

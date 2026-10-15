@@ -16,6 +16,10 @@ describe("buatNotifikasi", () => {
     const selesai = PESANAN_LIST.map((p) => ({ ...p, status: "selesai" as const }));
     expect(buatNotifikasi({ pesanan: selesai, komoditas: KOMODITAS_LIST }).some((n) => n.jenis === "dikemas")).toBe(false);
   });
+  it("ada notifikasi komplain selama komplain menunggu keputusan penjual", () => {
+    const hasil = buatNotifikasi({ pesanan: PESANAN_LIST, komoditas: KOMODITAS_LIST });
+    expect(hasil.find((n) => n.jenis === "komplain")?.target).toEqual({ type: "pesanan", id: "PSD-20231024-0074" });
+  });
   it("kunci notifikasi unik", () => {
     const keys = buatNotifikasi({ pesanan: PESANAN_LIST, komoditas: KOMODITAS_LIST }).map((n) => n.key);
     expect(new Set(keys).size).toBe(keys.length);

@@ -13,6 +13,7 @@ import { STATUS_LABEL } from "@/lib/pesanan";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import { cocokSemuaKata } from "@/lib/text";
 import type { Pesanan } from "@/types";
+import { labelPembayaran, sudahLunas } from "@/lib/pesanan";
 
 interface PesananListProps {
   judul: string;
@@ -150,8 +151,7 @@ export function PesananList({ judul, data, selectedId, onSelect }: PesananListPr
               <div className="flex items-center justify-between">
                 <p className="text-sm font-semibold text-ink-900">#{p.id}</p>
                 <div className="flex items-center gap-2">
-                  <StatusBadge status={p.status} />
-                  <span className="text-xs text-ink-400">{p.waktu}</span>
+                  <Badge tone={sudahLunas(p) ? "info" : "neutral"}>{labelPembayaran(p)}</Badge>                  <span className="text-xs text-ink-400">{p.waktu}</span>
                 </div>
               </div>
               <p className="mt-1 text-sm text-ink-700">{p.pembeli}</p>

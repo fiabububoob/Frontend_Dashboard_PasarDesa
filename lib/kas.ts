@@ -1,13 +1,16 @@
 import type { JalurPencairan, Pesanan, Rekening, TransaksiKas } from "@/types";
-import { hitungTotal } from "./pesanan";
+import { formatRupiah } from "./format";
+import { nilaiBersih, nilaiRefund } from "./komplain";
+import { STATUS_ESCROW } from "./pesanan";
 
-// Escrow = dana QRIS dari pesanan yang masih berjalan (belum selesai). Dana
-// ini baru masuk saldo aktif ketika pesanannya selesai.
+// Escrow = dana digital (QRIS/Saldo) dari pesanan yang masih berjalan (belum selesai, belum batal).
+// Dana ini baru masuk saldo aktif ketika pesanannya selesai. COD dibayar di tempat, jadi tidak di-escrow.
 export function pesananEscrow(pesanan: Pesanan[]): Pesanan[] {
-  return pesanan.filter((p) => p.metodeBayar === "QRIS" && p.status !== "selesai");
+  return pesanan.filter((p) => p.metodeBayar !== "COD" && STATUS_ESCROW.includes(p.status));
 }
 
-export const hitungEscrow = (pesanan: Pesanan[]) => hitungTotal(pesananEscrow(pesanan));
+// Nilai escrow = hak penjual atas pesanan yang berjalan (total dikurangi item yang sudah di-refund).
+export const hitungEscrow = (pesanan: Pesanan[]) => pesananEscrow(pesanan).reduce((sum, p) => sum + nilaiBersih(p), 0);
 
 // Status mutasi yang belum final (dana belum benar-benar berpindah) tampil kuning.
 const STATUS_BELUM_FINAL: TransaksiKas["status"][] = ["Diproses", "Menunggu Pengambilan"];
@@ -21,12 +24,14 @@ export function mutasiBelumFinal(status: TransaksiKas["status"]): boolean {
 // ---------------------------------------------------------------------------
 export type DraftTransaksi = Omit<TransaksiKas, "id" | "tanggal" | "waktu">;
 
+// Nominal = nilai bersih (setelah refund komplain). Bila ada refund, keterangannya disebutkan.
 export function transaksiPenjualan(p: Pesanan): DraftTransaksi {
+  const refund = nilaiRefund(p);
   return {
     deskripsi: "Hasil Penjualan Komoditas",
-    referensi: `Invoice: #${p.id} (${p.items.map((i) => i.komoditas).join(" + ")})`,
+    referensi: `Invoice: #${p.id} (${p.items.map((i) => i.komoditas).join(" + ")})${refund > 0 ? ` • setelah refund ${formatRupiah(refund)} ke pembeli` : ""}`,
     kategori: "Penjualan Lapak",
-    nominal: p.total,
+    nominal: nilaiBersih(p),
     status: "Berhasil Masuk",
   };
 }

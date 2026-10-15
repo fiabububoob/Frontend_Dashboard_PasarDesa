@@ -11,7 +11,7 @@ import type { ActionStatus } from "@/components/ui/Button";
 //   <Button status={status}>Simpan</Button>
 export function useActionStatus(resetAfterMs = 2000) {
   const [status, setStatus] = useState<ActionStatus>("idle");
-  const timer = useRef<ReturnType<typeof setTimeout>>();
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => () => clearTimeout(timer.current), []);
 

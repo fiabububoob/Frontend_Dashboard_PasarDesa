@@ -5,6 +5,7 @@ import { KAS_OMSET_AWAL, KAS_REKENING, KAS_SALDO_AWAL, KAS_TRANSAKSI } from "@/l
 import { TANGGAL_DATA_DUMMY } from "@/lib/constants";
 import { waktuWib } from "@/lib/format";
 import { formatIdTransaksi, transaksiPencairan, transaksiPenjualan, type DraftTransaksi } from "@/lib/kas";
+import { nilaiBersih } from "@/lib/komplain";
 import type { JalurPencairan, Pesanan, Rekening, TransaksiKas } from "@/types";
 
 const NOMOR_REFERENSI_AWAL = 8812;
@@ -30,13 +31,16 @@ export function useKasState() {
     setTransaksi((daftar) => [baru, ...daftar]);
   }, []);
 
-  // Pesanan selesai → escrow lepas: saldo aktif & omset naik, penjualan tercatat (sekali per pesanan).
+  // Pesanan selesai → escrow lepas: saldo aktif & omset naik sebesar NILAI BERSIH (setelah refund
+  // komplain), penjualan tercatat (sekali per pesanan). Bila seluruhnya di-refund, tidak ada yang dicatat.
   const catatPenjualan = useCallback(
     (p: Pesanan) => {
       if (sudahDibukukan.current.has(p.id)) return;
       sudahDibukukan.current.add(p.id);
-      setSaldoAktif((s) => s + p.total);
-      setOmset((o) => o + p.total);
+      const bersih = nilaiBersih(p);
+      if (bersih <= 0) return;
+      setSaldoAktif((s) => s + bersih);
+      setOmset((o) => o + bersih);
       catat(transaksiPenjualan(p));
     },
     [catat],

@@ -2,6 +2,7 @@ import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { LinkButton } from "@/components/ui/LinkButton";
 import { waLink } from "@/lib/format";
+import { LABEL_OPSI_PENGIRIMAN } from "@/lib/pesanan";
 import type { Pesanan } from "@/types";
 
 export function KartuPembeli({ pesanan }: { pesanan: Pesanan }) {
@@ -11,8 +12,14 @@ export function KartuPembeli({ pesanan }: { pesanan: Pesanan }) {
     <div className="rounded-lg border border-line p-4">
       <p className="text-xs font-medium uppercase text-ink-400">Informasi Pembeli</p>
       <p className="mt-2 text-sm font-medium text-ink-900">{pesanan.pembeli}</p>
-      <p className="text-xs text-ink-500">{pesanan.alamat}</p>
-      <p className="mt-1 text-xs text-ink-500">Drop-point: {pesanan.dropPoint}</p>
+      <p className="text-xs text-ink-500">
+        {pesanan.alamat}
+        {pesanan.rtRw && ` · ${pesanan.rtRw}`}
+      </p>
+      {pesanan.patokan && <p className="text-xs text-ink-500">Patokan: {pesanan.patokan}</p>}
+      <p className="mt-1 text-xs text-ink-500">
+        {LABEL_OPSI_PENGIRIMAN[pesanan.opsiPengiriman]} · Drop-point: {pesanan.dropPoint}
+      </p>
       {pesanan.catatan && <p className="mt-2 rounded-lg bg-surface-muted p-2.5 text-xs italic text-ink-500">&ldquo;{pesanan.catatan}&rdquo;</p>}
       {pesanan.telepon ? (
         <LinkButton href={waLink(pesanan.telepon, pesanWa)} external size="sm" className="mt-3 w-full">

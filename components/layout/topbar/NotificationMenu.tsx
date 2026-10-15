@@ -9,6 +9,7 @@ import { buatNotifikasi, type JenisNotifikasi } from "@/lib/notifikasi";
 import { Popover } from "./Popover";
 
 const TAMPILAN: Record<JenisNotifikasi, { icon: LucideIcon; warna: string }> = {
+  komplain: { icon: AlertTriangle, warna: "text-danger-600" },
   dikemas: { icon: Package, warna: "text-warn-600" },
   "stok-kritis": { icon: AlertTriangle, warna: "text-danger-600" },
   kurir: { icon: Bike, warna: "text-brand-600" },

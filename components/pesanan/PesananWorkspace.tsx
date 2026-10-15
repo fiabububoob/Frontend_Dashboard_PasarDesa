@@ -15,7 +15,7 @@ import { useActionStatus } from "@/lib/hooks/useActionStatus";
 import { simulateRequest } from "@/lib/fake-api";
 import { INTERVAL_REFRESH_DATA_MS, LATENSI } from "@/lib/constants";
 import { formatJam } from "@/lib/format";
-import { hitungStatus, perluDijemput } from "@/lib/pesanan";
+import { perluDijemput, pesananDiTab } from "@/lib/pesanan";
 import { statPesanan } from "@/lib/stats";
 import { PESANAN_TABS } from "@/lib/data/pesanan";
 import { PesananList } from "./PesananList";
@@ -37,8 +37,7 @@ export function PesananWorkspace() {
   const [diperbarui, setDiperbarui] = useState<Date | null>(null);
 
   const tabAktif = PESANAN_TABS.find((t) => t.label === tab) ?? PESANAN_TABS[0];
-  const filtered = useMemo(() => (tabAktif.key === "semua" ? pesanan : pesanan.filter((p) => p.status === tabAktif.key)), [pesanan, tabAktif]);
-
+  const filtered = useMemo(() => pesananDiTab(pesanan, tabAktif), [pesanan, tabAktif]);
   // Auto-update 30 detik. Belum ada backend, jadi "memuat ulang" hanya
   // memperbarui cap waktu; ganti isi fetchTerbaru() dengan panggilan API nanti.
   async function fetchTerbaru() {
@@ -67,11 +66,9 @@ export function PesananWorkspace() {
   function gantiTab(label: string) {
     setTab(label);
     const t = PESANAN_TABS.find((x) => x.label === label);
-    const list = !t || t.key === "semua" ? pesanan : pesanan.filter((p) => p.status === t.key);
-    setSelectedId(list[0]?.id ?? "");
+    setSelectedId((t ? pesananDiTab(pesanan, t) : pesanan)[0]?.id ?? "");
   }
 
-  const hitung = (key: (typeof PESANAN_TABS)[number]["key"]) => (key === "semua" ? pesanan.length : hitungStatus(pesanan, key));
   const selected = pesanan.find((p) => p.id === selectedId);
   const jumlahSuratJalan = pesanan.filter(perluDijemput).length;
 
@@ -108,13 +105,13 @@ export function PesananWorkspace() {
         </div>
 
         <div className="mt-5">
-          <FilterPills options={PESANAN_TABS.map((t) => ({ label: t.label, count: hitung(t.key) }))} active={tab} onChange={gantiTab} />
+          <FilterPills options={PESANAN_TABS.map((t) => ({ label: t.label, count: pesananDiTab(pesanan, t).length }))} active={tab} onChange={gantiTab} />
         </div>
       </Card>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
         <div className="lg:col-span-2">
-          <PesananList judul={tabAktif.key === "semua" ? "Daftar Semua Pesanan" : `Daftar ${tabAktif.label}`} data={filtered} selectedId={selectedId} onSelect={setSelectedId} />
+          <PesananList judul={tabAktif.status === null ? "Daftar Semua Pesanan" : `Daftar ${tabAktif.label}`} data={filtered} selectedId={selectedId} onSelect={setSelectedId} />
         </div>
         <div className="lg:col-span-3">
           {selected ? (

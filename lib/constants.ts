@@ -35,6 +35,12 @@ export const MAKS_SARAN_PENYIMPANAN = 200;
 /** Kloter jemput kurir desa sore hari. */
 export const JAM_JEMPUT_SORE = "15:00 WIB";
 
+/** Dana penjual dilepas otomatis sekian jam setelah paket tiba di pos, bila pembeli belum menekan "Pesanan Diterima" dan tidak ada komplain (keputusan D7). */
+export const PELEPASAN_OTOMATIS_JAM = 24;
+
+/** Alat bantu pengembangan (mis. simulasi aksi pembeli). Otomatis hilang pada build produksi. */
+export const MODE_DEMO = process.env.NODE_ENV !== "production";
+
 /** Biaya kurir desa (flat per dusun) dan subsidinya dari kas BUMDes. */
 export const ONGKIR_FLAT = 5000;
 export const SUBSIDI_ONGKIR = 5000;

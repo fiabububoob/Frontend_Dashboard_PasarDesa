@@ -59,13 +59,15 @@ export function statKomoditas(komoditas: Komoditas[]): StatCard[] {
 }
 
 export function statPesanan(pesanan: Pesanan[]): StatCard[] {
-  const dikirim = pesanan.filter((p) => p.status === "sedang-dikemas");
+  const dikirim = pesanan.filter((p) => p.status === "diantar" || p.status === "tiba-di-pos");
   const jumlahWilayah = new Set(dikirim.map((p) => p.dropPoint)).size;
+  // Pesanan yang belum dibayar atau dibatalkan belum/tidak menjadi perputaran.
+  const berjalan = pesanan.filter((p) => p.status !== "menunggu-pembayaran" && p.status !== "dibatalkan");
   return [
     { id: "antrean", label: "Antrean Kemas", value: `${hitungStatus(pesanan, "perlu-dikemas")} Paket`, helper: `Batas jemput ${JAM_JEMPUT_SORE}` },
     { id: "pickup", label: "Siap Pickup Kurir", value: `${hitungStatus(pesanan, "siap-jemput")} Pesanan`, helper: "Mas Slamet on-duty" },
     { id: "antaran", label: "Dalam Antaran", value: `${jumlahWilayah} Wilayah`, helper: `${dikirim.length} pesanan menuju drop-point` },
-    { id: "perputaran", label: "Perputaran Hari Ini", value: formatRupiah(hitungTotal(pesanan)), helper: `${pesanan.length} Transaksi total` },
+    { id: "perputaran", label: "Perputaran Hari Ini", value: formatRupiah(hitungTotal(berjalan)), helper: `${berjalan.length} Transaksi total` },
   ];
 }
 

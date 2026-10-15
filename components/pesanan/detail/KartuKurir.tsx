@@ -14,7 +14,9 @@ export function KartuKurir({ pesanan }: { pesanan: Pesanan }) {
   return (
     <div className="rounded-lg border border-line p-4">
       <p className="text-xs font-medium uppercase text-ink-400">Kurir Desa</p>
-      {kurir ? (
+      {pesanan.opsiPengiriman === "ambil-mandiri" ? (
+        <p className="mt-2 text-sm text-ink-500">Pembeli mengambil sendiri di pos, jadi tidak memakai kurir.</p>
+      ) : kurir ? (
         <>
           <p className="mt-2 text-sm font-medium text-ink-900">{kurir.nama}</p>
           <p className="text-xs text-ink-500">{kurir.armada}</p>
