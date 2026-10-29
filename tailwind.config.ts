@@ -38,19 +38,21 @@ const config: Config = {
           400: "#9CA3AF",
           200: "#D8DDE3",
         },
-        line: "#E8EBEF",
+        line: "#E4E9E5",
+        canvas: "#F4F6F3",
+        rupiah: "#B3261E",
         warn: { 50: "#FDF3E2", 400: "#E3A33D", 600: "#B4700C" },
         danger: { 50: "#FBEAE6", 600: "#B23B24", 700: "#9A3020", 800: "#7E2719" },
         info: { 50: "#EEF1FB", 600: "#4C5FA6" },
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "-apple-system", "Segoe UI", "system-ui", "sans-serif"],
-        display: ["var(--font-jakarta)", "var(--font-inter)", "-apple-system", "Segoe UI", "system-ui", "sans-serif"],
+        sans: ["var(--font-jakarta)", "-apple-system", "Segoe UI", "system-ui", "sans-serif"],
+        display: ["var(--font-jakarta)", "-apple-system", "Segoe UI", "system-ui", "sans-serif"],
       },
       boxShadow: {
         card: "0 1px 2px rgba(33, 31, 27, 0.04), 0 1px 3px rgba(33, 31, 27, 0.06)",
       },
-      borderRadius: { xl: "12px" },
+      borderRadius: { xl: "12px", "2xl": "16px" },
 
       // --- Motion (unchanged from lib/motion.ts) --------------------------
       transitionDuration: {
@@ -79,6 +81,8 @@ const config: Config = {
           from: { opacity: "1", transform: "none" },
           to: { opacity: "0", transform: "translateY(8px) scale(0.98)" },
         },
+        "drawer-in": { from: { transform: "translateX(100%)" }, to: { transform: "none" } },
+        "drawer-out": { from: { transform: "none" }, to: { transform: "translateX(100%)" } },
         "toast-in": {
           from: { opacity: "0", transform: "translateY(12px)" },
           to: { opacity: "1", transform: "none" },
@@ -108,6 +112,8 @@ const config: Config = {
         "backdrop-out": `fade-out ${ms(DURATION.exit)} ${EASING.exit} both`,
         "dialog-in": `dialog-in ${ms(DURATION.enter)} ${EASING.enter} both`,
         "dialog-out": `dialog-out ${ms(DURATION.exit)} ${EASING.exit} both`,
+        "drawer-in": `drawer-in ${ms(DURATION.enter)} ${EASING.enter} both`,
+        "drawer-out": `drawer-out ${ms(DURATION.exit)} ${EASING.exit} both`,
         "toast-in": `toast-in ${ms(DURATION.enter)} ${EASING.enter} both`,
         "toast-out": `toast-out ${ms(DURATION.exit)} ${EASING.exit} both`,
         pop: `pop ${ms(DURATION.enter)} ${EASING.enter} both`,

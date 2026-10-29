@@ -23,7 +23,7 @@ export function LaporanKasContent() {
         <div>
           <p className="font-display text-base font-bold text-ink-900">LAPORAN KAS POKTAN — {PERIODE_LAPORAN.toUpperCase()}</p>
           <p className="text-xs text-ink-500">
-            Buku Kas Digital No. REG-041/SKR/2023 · Dicetak {tanggal}
+            Buku Kas Digital No. REG-041/SKR/2026 · Dicetak {tanggal}
           </p>
         </div>
 

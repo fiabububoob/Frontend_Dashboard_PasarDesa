@@ -29,23 +29,15 @@ export function FilterPills({ options, defaultActive, active: activeProp, onChan
           <button
             key={option.label}
             type="button"
+            aria-pressed={isActive}
             onClick={() => setActive(option.label)}
             className={clsx(
-              "flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors duration-feedback ease-enter",
+              "whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition-colors duration-feedback ease-enter",
               isActive ? "border-brand-600 bg-brand-600 text-white" : "border-line bg-surface text-ink-700 hover:bg-surface-muted",
             )}
           >
             {option.label}
-            {option.count !== undefined && (
-              <span
-                className={clsx(
-                  "rounded-full px-1.5 py-0.5 text-xs",
-                  isActive ? "bg-white/25" : "bg-surface-sunken text-ink-500",
-                )}
-              >
-                {option.count}
-              </span>
-            )}
+            {option.count !== undefined && ` (${option.count})`}
           </button>
         );
       })}

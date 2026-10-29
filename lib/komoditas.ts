@@ -1,6 +1,7 @@
-import type { BadgeProduk, Komoditas, KomoditasBaru, KomoditasUbah } from "@/types";
+import type { BadgeProduk, Komoditas, KomoditasBaru, KomoditasUbah, SumberKomoditas } from "@/types";
 import { BADGE_PRODUK } from "./data/badgeProduk";
 import { formatTanggal, isoTanggal } from "./format";
+import { indukDari } from "./kategori";
 import { hitungStatusStok } from "./stok";
 
 // Aturan bisnis komoditas sebagai fungsi murni (tanpa React): dipakai oleh
@@ -32,7 +33,7 @@ export function buatKomoditas(daftar: Komoditas[], data: KomoditasBaru): Komodit
     id: sku,
     sku,
     stok,
-    statusStok: hitungStatusStok(stok, data.stokMaks),
+    statusStok: hitungStatusStok(stok, data.stokMaks, data.batasStokRendah),
     waktuPanen: "Baru ditambahkan",
     waktuKeterangan: "Dicatat dari Manajemen Komoditas",
     tampil: data.tampil ?? true,
@@ -46,7 +47,7 @@ export function tambahStokKomoditas(k: Komoditas, jumlah: number, catatan?: stri
   return {
     ...k,
     stok,
-    statusStok: hitungStatusStok(stok, k.stokMaks),
+    statusStok: hitungStatusStok(stok, k.stokMaks, k.batasStokRendah),
     waktuPanen: "Baru saja",
     tanggalPanen: isoTanggal(sekarang),
     waktuKeterangan: catatan ?? "Dicatat dari Ringkasan",
@@ -56,7 +57,7 @@ export function tambahStokKomoditas(k: Komoditas, jumlah: number, catatan?: stri
 export function ubahKomoditas(k: Komoditas, data: KomoditasUbah): Komoditas {
   const hasil = { ...k, ...data };
   hasil.stok = Math.min(hasil.stok, hasil.stokMaks);
-  hasil.statusStok = hitungStatusStok(hasil.stok, hasil.stokMaks);
+  hasil.statusStok = hitungStatusStok(hasil.stok, hasil.stokMaks, hasil.batasStokRendah);
   return hasil;
 }
 
@@ -86,3 +87,45 @@ export function waktuPanenLabel(k: Pick<Komoditas, "tanggalPanen" | "waktuPanen"
 }
 
 export const labelBadge = (kode: BadgeProduk): string => BADGE_PRODUK.find((b) => b.kode === kode)?.label ?? kode;
+
+// ---------------------------------------------------------------------------
+// Tampilan daftar komoditas (tab status, kolom penjual/ketersediaan)
+// ---------------------------------------------------------------------------
+export type StatusTampilan = "aktif" | "stok-rendah" | "nonaktif";
+
+export const LABEL_STATUS_TAMPILAN: Record<StatusTampilan, string> = {
+  aktif: "Aktif",
+  "stok-rendah": "Stok Rendah",
+  nonaktif: "Nonaktif",
+};
+
+// Tiga kondisi yang saling lepas: disembunyikan = Nonaktif; tampil tetapi stok kritis = Stok Rendah; selain itu Aktif.
+export function statusTampilan(k: Pick<Komoditas, "tampil" | "statusStok">): StatusTampilan {
+  if (!k.tampil) return "nonaktif";
+  return k.statusStok === "kritis" ? "stok-rendah" : "aktif";
+}
+
+const SUMBER_PER_INDUK: Record<string, SumberKomoditas> = {
+  "Hasil Tani": "Petani",
+  "Ternak Ikan": "UMKM",
+  "UMKM Desa": "UMKM",
+  Sembako: "BUMDes",
+};
+
+export const sumberDari = (k: Pick<Komoditas, "sumber" | "kategori">): SumberKomoditas =>
+  k.sumber ?? SUMBER_PER_INDUK[indukDari(k.kategori)?.nama ?? ""] ?? "Petani";
+
+export const penjualDari = (k: Pick<Komoditas, "penjual" | "asalBlok">): string => k.penjual ?? k.asalBlok;
+
+export const ketersediaanDari = (k: Pick<Komoditas, "ketersediaan">): string => k.ketersediaan ?? "Siap kirim";
+
+/** Nama kategori utama (induk) dari sub-kategori komoditas. */
+export const indukNama = (k: Pick<Komoditas, "kategori">): string => indukDari(k.kategori)?.nama ?? k.kategori;
+
+/** Dua huruf untuk foto placeholder: "Beras Pandan Wangi" → "BP". */
+export function inisialProduk(nama: string): string {
+  const kata = nama.trim().split(/\s+/);
+  return (kata.length > 1 ? kata[0][0] + kata[1][0] : nama.slice(0, 2)).toUpperCase();
+}
+
+export const hitungStatusTampilan = (daftar: Komoditas[], status: StatusTampilan): number => daftar.filter((k) => statusTampilan(k) === status).length;

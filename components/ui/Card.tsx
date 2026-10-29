@@ -7,7 +7,7 @@ export function Card({ className, children, ...props }: HTMLAttributes<HTMLDivEl
   return (
     <div
       className={clsx(
-        "rounded-xl border border-line bg-surface",
+        "rounded-2xl border border-line bg-surface",
         className,
       )}
       {...props}

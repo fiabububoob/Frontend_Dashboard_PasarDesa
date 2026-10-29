@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
-// Inter: body text & tables — tuned for legibility at small sizes.
-// Plus Jakarta Sans: headings only — warmer and friendlier than Inter alone,
-// a common pairing for approachable (non-enterprise-cold) SaaS products.
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+// Plus Jakarta Sans dipakai untuk seluruh teks (judul & isi) sesuai desain.
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
+  weight: ["400", "500", "600", "700", "800"],
   variable: "--font-jakarta",
   display: "swap",
 });
@@ -20,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className={`${inter.variable} ${jakarta.variable}`}>
+    <html lang="id" className={`${jakarta.variable}`}>
       <body className="font-sans text-ink-900">{children}</body>
     </html>
   );

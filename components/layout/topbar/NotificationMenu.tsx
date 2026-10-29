@@ -32,7 +32,7 @@ export function NotificationMenu() {
           aria-label="Notifikasi"
           aria-expanded={buka}
           onClick={toggle}
-          className="relative rounded-lg border border-line p-2.5 text-ink-500 transition-colors duration-feedback ease-enter hover:bg-surface-muted"
+          className="relative rounded-xl border border-line p-2.5 text-ink-500 transition-colors duration-feedback ease-enter hover:bg-surface-muted"
         >
           <Bell className="h-[18px] w-[18px]" />
           {!sudahDibaca && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-danger-600" />}

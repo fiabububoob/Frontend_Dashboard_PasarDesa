@@ -2,9 +2,9 @@
 // didefinisikan di sini supaya tidak ada "magic value" yang tersebar.
 
 /** "Hari ini" pada data dummy (data awal ditulis untuk tanggal ini). */
-export const TANGGAL_DATA_DUMMY = "24 Okt 2023";
+export const TANGGAL_DATA_DUMMY = "24 Okt 2026";
 export const BULAN_LAPORAN = "Oktober";
-export const PERIODE_LAPORAN = `${BULAN_LAPORAN} 2023`;
+export const PERIODE_LAPORAN = `${BULAN_LAPORAN} 2026`;
 
 /** Jumlah baris per halaman pada tabel yang berpaginasi. */
 export const UKURAN_HALAMAN = 5;

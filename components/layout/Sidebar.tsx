@@ -11,12 +11,12 @@ import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { useStatusLapak } from "@/components/providers/useStatusLapak";
 import { hitungStatus } from "@/lib/pesanan";
 
-const ITEM_BASE = "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors duration-feedback ease-enter";
-const ITEM_IDLE = "font-medium text-ink-500 hover:bg-surface-muted hover:text-ink-900";
-const ITEM_ACTIVE = "bg-brand-50 font-semibold text-brand-700";
+const ITEM_BASE = "flex w-full items-center gap-3 rounded-lg border-l-[3px] border-transparent px-3 py-2.5 text-sm transition-colors duration-feedback ease-enter";
+const ITEM_IDLE = "font-medium text-ink-700 hover:bg-surface-muted hover:text-ink-900";
+const ITEM_ACTIVE = "border-brand-600 bg-brand-50 font-semibold text-brand-900";
 
 function GroupLabel({ children }: { children: string }) {
-  return <p className="px-3 pb-2 text-xs font-medium text-ink-400">{children}</p>;
+  return <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-ink-500">{children}</p>;
 }
 
 // Sidebar reads NAV_ITEMS from lib/nav-items.ts — it has zero knowledge of
@@ -35,9 +35,9 @@ export function Sidebar() {
   const keterangan = !lapak ? "" : lapak.buka ? `Menerima pesanan · ${lapak.keterangan}` : lapak.keterangan;
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col px-4 pb-5 pt-6 lg:flex">
-      <div className="flex items-center gap-2.5 px-3 pb-8">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white">
+    <aside className="hidden w-[230px] shrink-0 flex-col border-r border-line bg-surface px-3.5 pb-5 pt-5 lg:flex">
+      <div className="flex items-center gap-2.5 px-1.5 pb-7">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100 text-brand-600">
           <Sprout className="h-5 w-5" />
         </div>
         <div>
@@ -62,7 +62,7 @@ export function Sidebar() {
                     <span className="truncate">{item.label}</span>
                   </span>
                   {badge !== undefined && (
-                    <span aria-label={`${badge} pesanan baru`} className="shrink-0 rounded-full bg-warn-50 px-2 py-0.5 text-[11px] font-semibold text-warn-600">
+                    <span aria-label={`${badge} pesanan baru`} className="shrink-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#B8420F] px-1.5 text-[11px] font-semibold text-white">
                       {badge}
                     </span>
                   )}
@@ -72,7 +72,7 @@ export function Sidebar() {
           })}
         </ul>
 
-        <div className="mt-8">
+        <div className="mt-6 border-t border-line pt-6">
           <GroupLabel>Bantuan</GroupLabel>
           <ul className="space-y-1">
             <li>
@@ -92,9 +92,9 @@ export function Sidebar() {
       </nav>
 
       {/* Status toko: satu-satunya info di dasar sidebar, bergaya outline seperti tombol Logout pada referensi */}
-      <div className={clsx("rounded-lg border px-3 py-2.5", buka ? "border-line" : "border-warn-400/50 bg-warn-50")} aria-live="polite">
-        <p className="flex items-center gap-2 text-sm font-medium text-ink-900">
-          <span className={clsx("h-2 w-2 rounded-full", buka ? "bg-brand-500" : "bg-warn-400")} />
+      <div className={clsx("rounded-xl border px-3 py-2.5", buka ? "border-brand-200 bg-brand-50" : "border-warn-400/40 bg-[#FFF6DB]")} aria-live="polite">
+        <p className="flex items-center gap-2 text-sm font-semibold text-[#7A4B00]">
+          <span className={clsx("h-2.5 w-2.5 rounded-full", buka ? "bg-brand-500" : "bg-warn-400")} />
           {judulStatus}
         </p>
         {keterangan && <p className="mt-0.5 pl-4 text-xs text-ink-500">{keterangan}</p>}

@@ -1,5 +1,4 @@
 import type { Komoditas, Pesanan, StatCard } from "@/types";
-import { KAS_SUBSIDI } from "@/lib/data/kas";
 import { RINGKASAN_PENJUALAN } from "@/lib/data/ringkasan";
 import { PRE_ORDER_SAAT_INI } from "@/lib/data/komoditas";
 import { BULAN_LAPORAN, JAM_JEMPUT_SORE } from "./constants";
@@ -61,13 +60,10 @@ export function statKomoditas(komoditas: Komoditas[]): StatCard[] {
 export function statPesanan(pesanan: Pesanan[]): StatCard[] {
   const dikirim = pesanan.filter((p) => p.status === "diantar" || p.status === "tiba-di-pos");
   const jumlahWilayah = new Set(dikirim.map((p) => p.dropPoint)).size;
-  // Pesanan yang belum dibayar atau dibatalkan belum/tidak menjadi perputaran.
-  const berjalan = pesanan.filter((p) => p.status !== "menunggu-pembayaran" && p.status !== "dibatalkan");
   return [
     { id: "antrean", label: "Antrean Kemas", value: `${hitungStatus(pesanan, "perlu-dikemas")} Paket`, helper: `Batas jemput ${JAM_JEMPUT_SORE}` },
     { id: "pickup", label: "Siap Pickup Kurir", value: `${hitungStatus(pesanan, "siap-jemput")} Pesanan`, helper: "Mas Slamet on-duty" },
     { id: "antaran", label: "Dalam Antaran", value: `${jumlahWilayah} Wilayah`, helper: `${dikirim.length} pesanan menuju drop-point` },
-    { id: "perputaran", label: "Perputaran Hari Ini", value: formatRupiah(hitungTotal(berjalan)), helper: `${berjalan.length} Transaksi total` },
   ];
 }
 
@@ -80,9 +76,8 @@ interface DataKas {
 export function statKas({ pesanan, saldoAktif, omset }: DataKas): StatCard[] {
   const berjalan = pesananEscrow(pesanan);
   return [
-    { id: "saldo-aktif", label: "Saldo Aktif Siap Tarik", value: formatRupiah(saldoAktif) },
+    { id: "saldo-aktif", label: "Saldo Aktif Siap Tarik", value: formatRupiah(saldoAktif), helper: "Bisa ditarik kapan saja" },
     { id: "saldo-escrow", label: "Saldo Tertahan (Escrow)", value: formatRupiah(hitungTotal(berjalan)), helper: `${berjalan.length} pesanan berjalan` },
-    { id: "omset", label: `Omset Bersih ${BULAN_LAPORAN}`, value: formatRupiah(omset), trend: { direction: "up", value: "Bebas potongan" } },
-    { id: "subsidi", label: "Subsidi Ongkir BUMDes", value: formatRupiah(KAS_SUBSIDI), helper: "Reimburse 100% kas desa" },
+    { id: "omset", label: `Omset Bersih ${BULAN_LAPORAN}`, value: formatRupiah(omset), helper: "Bebas potongan" },
   ];
 }

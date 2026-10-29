@@ -8,7 +8,7 @@ import type { StatusPesanan } from "@/types";
 const TONE: Record<StatusPesanan, BadgeTone> = {
   "menunggu-pembayaran": "warning",
   "perlu-dikemas": "warning",
-  "siap-jemput": "success",
+  "siap-jemput": "info",
   diantar: "info",
   "tiba-di-pos": "info",
   komplain: "danger",

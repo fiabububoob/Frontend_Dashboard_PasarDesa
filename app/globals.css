@@ -7,7 +7,7 @@ html {
 }
 
 body {
-  background-color: theme("colors.surface.DEFAULT");
+  background-color: theme("colors.canvas");
 }
 
 /* Aksesibilitas: fokus keyboard selalu terlihat jelas. */

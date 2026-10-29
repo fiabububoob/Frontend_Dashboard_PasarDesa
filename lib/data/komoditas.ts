@@ -15,6 +15,9 @@ export const PRE_ORDER_SAAT_INI = { jumlah: 1, estimasi: "Estimasi 14 hari" };
 export const KOMODITAS_LIST: Komoditas[] = [
   {
     id: "SKR-PND-05",
+    penjual: "Kel. Tani Makmur Sejahtera",
+    terjual: 340,
+    ketersediaan: "Siap kirim",
     sku: "SKR-PND-05",
     nama: "Beras Pandan Wangi Sukorejo 5kg",
     gambar: "🌾",
@@ -46,6 +49,9 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-JGN-01",
+    penjual: "Kel. Tani Krajan",
+    terjual: 156,
+    ketersediaan: "Siap kirim",
     sku: "SKR-JGN-01",
     nama: "Jagung Manis Organik Blok Timur 1kg",
     gambar: "🌽",
@@ -66,6 +72,9 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-CBI-05",
+    penjual: "Kel. Tani Krajan",
+    terjual: 98,
+    ketersediaan: "Siap kirim",
     sku: "SKR-CBI-05",
     nama: "Cabai Rawit Merah Petik Pagi 500g",
     gambar: "🌶️",
@@ -87,6 +96,9 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-BWG-01",
+    penjual: "Kel. Tani Tegalrejo",
+    terjual: 74,
+    ketersediaan: "Siap kirim",
     sku: "SKR-BWG-01",
     nama: "Bawang Merah Brebes Sukorejo 1kg",
     gambar: "🧅",
@@ -104,6 +116,9 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-TLR-10",
+    penjual: "Kandang Pak RT",
+    terjual: 64,
+    ketersediaan: "Panen pagi",
     sku: "SKR-TLR-10",
     nama: "Telur Ayam Kampung Asli 10 Butir",
     gambar: "🥚",
@@ -122,6 +137,9 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-BRM-05",
+    penjual: "Kel. Tani Makmur Sejahtera",
+    terjual: 121,
+    ketersediaan: "Siap kirim",
     sku: "SKR-BRM-05",
     nama: "Beras Merah Organik Sukorejo 5kg",
     gambar: "🌾",
@@ -140,6 +158,9 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-GBH-25",
+    penjual: "Kel. Tani Makmur Sejahtera",
+    terjual: 38,
+    ketersediaan: "Siap kirim",
     sku: "SKR-GBH-25",
     nama: "Gabah Kering Giling Lumbung 25kg",
     gambar: "🌾",
@@ -157,6 +178,9 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-KGK-01",
+    penjual: "Kel. Tani Krajan",
+    terjual: 112,
+    ketersediaan: "Panen pagi",
     sku: "SKR-KGK-01",
     nama: "Kangkung Segar Petik Pagi 1 Ikat",
     gambar: "🥬",
@@ -174,6 +198,9 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-TMT-01",
+    penjual: "Kel. Tani Krajan",
+    terjual: 87,
+    ketersediaan: "Siap kirim",
     sku: "SKR-TMT-01",
     nama: "Tomat Merah Segar Kebun RT 03 1kg",
     gambar: "🍅",
@@ -192,6 +219,9 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-KDL-01",
+    penjual: "Kel. Tani Timur",
+    terjual: 45,
+    ketersediaan: "Siap kirim",
     sku: "SKR-KDL-01",
     nama: "Kedelai Lokal Grade A 1kg",
     gambar: "🫘",
@@ -209,6 +239,9 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-AYM-01",
+    penjual: "Kandang Pak RT",
+    terjual: 52,
+    ketersediaan: "Siap kirim",
     sku: "SKR-AYM-01",
     nama: "Ayam Kampung Potong Segar 1kg",
     gambar: "🍗",
@@ -227,6 +260,9 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-TLB-06",
+    penjual: "Kandang Pak RT",
+    terjual: 29,
+    ketersediaan: "Siap kirim",
     sku: "SKR-TLB-06",
     nama: "Telur Bebek Asin Matang 6 Butir",
     gambar: "🥚",

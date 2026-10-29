@@ -9,10 +9,9 @@ import { formatRupiah } from "@/lib/format";
 // di sini — dihitung dari daftar pesanan di bawah, jadi selalu cocok dengan isinya.
 
 export const PESANAN_TABS: TabPesanan[] = [
-  { label: "Semua Pesanan", status: null },
-  { label: "Perlu Disiapkan / Dikemas", status: ["perlu-dikemas"] },
-  { label: "Siap Diambil Kurir Desa", status: ["siap-jemput"] },
-  { label: "Dalam Pengiriman", status: ["diantar", "tiba-di-pos"] },
+  { label: "Semua", status: null },
+  { label: "Perlu Dikemas", status: ["perlu-dikemas"] },
+  { label: "Dalam Antaran", status: ["siap-jemput", "diantar", "tiba-di-pos"] },
   { label: "Komplain", status: ["komplain"] },
   { label: "Selesai", status: ["selesai"] },
   { label: "Belum Bayar & Batal", status: ["menunggu-pembayaran", "dibatalkan"] },
@@ -43,7 +42,7 @@ const jamLalu = (jam: number) => new Date(Date.now() - jam * 3_600_000).toISOStr
 export const PESANAN_LIST: Pesanan[] = [
   // ---- Perlu dikemas (5) --------------------------------------------------
   pesanan({
-    id: "PSD-20231024-0089",
+    id: "PSD-20261024-0089",
     idPembayaran: "PD-SKR-88219",
     pembeli: "Pak RT Joko Susanto",
     alamat: "Warga Krajan RT 02 / RW 01",
@@ -59,7 +58,7 @@ export const PESANAN_LIST: Pesanan[] = [
     items: [item("Beras Pandan Wangi Sukorejo", 1, "sak", 68000, "Grade A"), item("Jagung Manis Organik", 2, "ikat", 12000, "Bebas Pestisida")],
   }),
   pesanan({
-    id: "PSD-20231024-0091",
+    id: "PSD-20261024-0091",
     pembeli: "Ibu Siti Aminah",
     alamat: "Kompleks Balai Desa",
     dropPoint: "Drop-Point Balai Desa Sukorejo",
@@ -70,7 +69,7 @@ export const PESANAN_LIST: Pesanan[] = [
     items: [item("Cabai Rawit Merah", 1, "bungkus", 36000)],
   }),
   pesanan({
-    id: "PSD-20231024-0092",
+    id: "PSD-20261024-0092",
     pembeli: "Warung Bu Sri",
     alamat: "Dusun Sidomulyo Gang 3",
     dropPoint: "Pos Kamling Dusun Sidomulyo",
@@ -81,7 +80,7 @@ export const PESANAN_LIST: Pesanan[] = [
     items: [item("Beras Pandan Wangi", 2, "sak", 68000)],
   }),
   pesanan({
-    id: "PSD-20231024-0093",
+    id: "PSD-20261024-0093",
     pembeli: "Bu Lastri",
     alamat: "Dusun Sidomulyo RT 01",
     dropPoint: "Pos Kamling Dusun Sidomulyo",
@@ -93,7 +92,7 @@ export const PESANAN_LIST: Pesanan[] = [
     items: [item("Tomat Merah", 2, "kg", 15000, "Bebas Pestisida"), item("Kangkung Segar", 4, "ikat", 3500)],
   }),
   pesanan({
-    id: "PSD-20231024-0094",
+    id: "PSD-20261024-0094",
     pembeli: "Pak Haji Mansur",
     alamat: "Dusun Krajan RT 04",
     dropPoint: "Pos Drop-Point BUMDes Krajan RT 02",
@@ -106,7 +105,7 @@ export const PESANAN_LIST: Pesanan[] = [
 
   // ---- Siap diambil kurir (3) ---------------------------------------------
   pesanan({
-    id: "PSD-20231024-0086",
+    id: "PSD-20261024-0086",
     pembeli: "Ibu Wahyuni",
     alamat: "Kompleks Balai Desa",
     dropPoint: "Drop-Point Balai Desa Sukorejo",
@@ -118,7 +117,7 @@ export const PESANAN_LIST: Pesanan[] = [
     items: [item("Beras Merah Organik", 1, "sak", 75000, "Organik"), item("Telur Bebek Asin", 2, "mika", 24000)],
   }),
   pesanan({
-    id: "PSD-20231024-0087",
+    id: "PSD-20261024-0087",
     pembeli: "Pak Darto",
     alamat: "Dusun Sidomulyo RT 03",
     dropPoint: "Pos Kamling Dusun Sidomulyo",
@@ -130,7 +129,7 @@ export const PESANAN_LIST: Pesanan[] = [
     items: [item("Gabah Kering Giling", 1, "karung", 210000)],
   }),
   pesanan({
-    id: "PSD-20231024-0088",
+    id: "PSD-20261024-0088",
     pembeli: "Warung Makan Bu Tini",
     alamat: "Jl. Raya Sukorejo No. 12",
     dropPoint: "Pos Drop-Point BUMDes Krajan RT 02",
@@ -145,7 +144,7 @@ export const PESANAN_LIST: Pesanan[] = [
 
   // ---- Dalam antaran ke drop-point (2) ------------------------------------
   pesanan({
-    id: "PSD-20231024-0083",
+    id: "PSD-20261024-0083",
     pembeli: "Mbak Rina",
     alamat: "Dusun Tegalrejo Lor RT 02",
     dropPoint: "Pos Ronda Tegalrejo Lor",
@@ -157,7 +156,7 @@ export const PESANAN_LIST: Pesanan[] = [
     items: [item("Kedelai Lokal", 3, "kg", 14500), item("Jagung Manis Organik", 1, "kg", 12000)],
   }),
   pesanan({
-    id: "PSD-20231024-0084",
+    id: "PSD-20261024-0084",
     pembeli: "Pak Slamet Riyadi",
     alamat: "Dusun Krajan RT 05",
     dropPoint: "Pos Drop-Point BUMDes Krajan RT 02",
@@ -171,7 +170,7 @@ export const PESANAN_LIST: Pesanan[] = [
 
   // ---- Selesai (4) ---------------------------------------------------------
   pesanan({
-    id: "PSD-20231024-0080",
+    id: "PSD-20261024-0080",
     pembeli: "Ibu Marni",
     alamat: "Kompleks Balai Desa",
     dropPoint: "Drop-Point Balai Desa Sukorejo",
@@ -183,7 +182,7 @@ export const PESANAN_LIST: Pesanan[] = [
     items: [item("Kangkung Segar", 6, "ikat", 3500), item("Tomat Merah", 1, "kg", 15000)],
   }),
   pesanan({
-    id: "PSD-20231024-0081",
+    id: "PSD-20261024-0081",
     pembeli: "Pak Karyo",
     alamat: "Dusun Sidomulyo RT 02",
     dropPoint: "Pos Kamling Dusun Sidomulyo",
@@ -195,7 +194,7 @@ export const PESANAN_LIST: Pesanan[] = [
     items: [item("Beras Merah Organik", 2, "sak", 75000, "Organik")],
   }),
   pesanan({
-    id: "PSD-20231024-0082",
+    id: "PSD-20261024-0082",
     pembeli: "Bu Endang",
     alamat: "Dusun Tegalrejo Lor RT 01",
     dropPoint: "Pos Ronda Tegalrejo Lor",
@@ -207,7 +206,7 @@ export const PESANAN_LIST: Pesanan[] = [
     items: [item("Telur Ayam Kampung", 2, "mika", 26000)],
   }),
   pesanan({
-    id: "PSD-20231024-0085",
+    id: "PSD-20261024-0085",
     pembeli: "Warung Pak Gito",
     alamat: "Jl. Raya Sukorejo No. 3",
     dropPoint: "Pos Drop-Point BUMDes Krajan RT 02",
@@ -221,7 +220,7 @@ export const PESANAN_LIST: Pesanan[] = [
 
   // ---- Komplain pembeli (dana ditahan sampai komplain selesai) -------------
   pesanan({
-    id: "PSD-20231024-0074",
+    id: "PSD-20261024-0074",
     idPembayaran: "PD-SKR-88150",
     pembeli: "Pak Budi Santoso",
     alamat: "Dusun Krajan Barat",
@@ -251,7 +250,7 @@ export const PESANAN_LIST: Pesanan[] = [
 
   // ---- Contoh status lain: tiba di pos, ambil mandiri, belum bayar, batal ---
   pesanan({
-    id: "PSD-20231024-0079",
+    id: "PSD-20261024-0079",
     idPembayaran: "PD-SKR-88190",
     pembeli: "Ibu Rahayu",
     alamat: "Dusun Krajan RT 03",
@@ -266,7 +265,7 @@ export const PESANAN_LIST: Pesanan[] = [
     items: [item("Telur Ayam Kampung", 2, "mika", 26000), item("Kangkung Segar", 3, "ikat", 3500)],
   }),
   pesanan({
-    id: "PSD-20231024-0096",
+    id: "PSD-20261024-0096",
     idPembayaran: "PD-SKR-88240",
     pembeli: "Pak Haryono",
     alamat: "Dusun Sidomulyo RT 04",
@@ -281,7 +280,7 @@ export const PESANAN_LIST: Pesanan[] = [
     items: [item("Beras Merah Organik", 1, "sak", 75000, "Organik")],
   }),
   pesanan({
-    id: "PSD-20231024-0097",
+    id: "PSD-20261024-0097",
     idPembayaran: "PD-SKR-88245",
     pembeli: "Bu Wulan",
     alamat: "Kompleks Balai Desa",
@@ -294,7 +293,7 @@ export const PESANAN_LIST: Pesanan[] = [
     items: [item("Cabai Rawit Merah", 2, "bungkus", 22500)],
   }),
   pesanan({
-    id: "PSD-20231024-0078",
+    id: "PSD-20261024-0078",
     idPembayaran: "PD-SKR-88170",
     pembeli: "Pak Tarno",
     alamat: "Dusun Tegalrejo Lor RT 02",

@@ -55,7 +55,7 @@ export function Input({
       <div
         onAnimationEnd={() => setShaking(false)}
         className={clsx(
-          "flex items-center overflow-hidden rounded-lg border bg-white",
+          "flex items-center overflow-hidden rounded-xl border bg-white",
           "transition-[border-color,box-shadow,background-color] duration-feedback ease-enter",
           hasError
             ? "border-danger-600 ring-1 ring-danger-600/30"
@@ -79,7 +79,7 @@ export function Input({
             onChange?.(e);
           }}
           className={clsx(
-            "w-full bg-transparent px-3 py-2.5 text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none disabled:cursor-not-allowed disabled:text-ink-500",
+            "w-full bg-transparent px-3.5 py-3 text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none disabled:cursor-not-allowed disabled:text-ink-500",
             className,
           )}
         />

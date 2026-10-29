@@ -5,7 +5,6 @@ import { Modal } from "@/components/ui/Modal";
 import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { PERIODE_LAPORAN } from "@/lib/constants";
 import { WARTA_LIST, HOTLINE_BUMDES } from "@/lib/data/ringkasan";
-import { PesananContent } from "./PesananContent";
 import { KomoditasContent } from "./KomoditasContent";
 import { KategoriContent } from "./KategoriContent";
 import { KurirContent } from "./KurirContent";
@@ -14,7 +13,6 @@ import { TambahPanenForm } from "./TambahPanenForm";
 import { RekapContent } from "./RekapContent";
 import { LaporanContent } from "./LaporanContent";
 import { HotlineContent } from "./HotlineContent";
-import { KomoditasForm } from "./KomoditasForm";
 import { ImporEksporContent } from "./ImporEksporContent";
 import { NotaContent } from "./NotaContent";
 import { SuratJalanContent } from "./SuratJalanContent";
@@ -24,6 +22,9 @@ import { LaporanKasContent } from "./LaporanKasContent";
 import { PratinjauWargaContent } from "./PratinjauWargaContent";
 import { PiagamContent } from "./PiagamContent";
 import { ProfilPenggunaForm } from "./ProfilPenggunaForm";
+import { KomoditasForm as KomoditasFormDrawer } from "./KomoditasForm";
+import { TarikSaldoDrawer } from "./TarikSaldoDrawer";
+import { PesananDrawer } from "@/components/pesanan/PesananDrawer";
 import type { DetailTarget } from "@/types";
 
 interface DetailApi {
@@ -55,13 +56,34 @@ export function DetailProvider({ children }: { children: ReactNode }) {
   return (
     <Ctx.Provider value={api}>
       {children}
-      {current && meta && (
+      {current && meta && (isDrawer(current) ? (
+        renderDrawer(current, stack.length, close)
+      ) : (
         <Modal title={meta.title} subtitle={meta.subtitle} size={meta.size} onClose={close} onBack={stack.length > 1 ? back : undefined}>
           {renderBody(current)}
         </Modal>
-      )}
+      ))}
     </Ctx.Provider>
   );
+}
+
+// Form dan detail utama tampil sebagai panel samping kanan; sisanya tetap modal di tengah layar.
+function isDrawer(t: DetailTarget) {
+  return t.type === "form-komoditas" || t.type === "tarik-saldo" || t.type === "pesanan";
+}
+
+function renderDrawer(t: DetailTarget, kedalaman: number, close: () => void) {
+  switch (t.type) {
+    case "form-komoditas":
+      return <KomoditasFormDrawer key={`${kedalaman}-${t.id ?? "baru"}`} id={t.id} />;
+    case "tarik-saldo":
+      return <TarikSaldoDrawer key={kedalaman} />;
+    case "pesanan":
+      return <PesananDrawer key={`${kedalaman}-${t.id}`} id={t.id} />;
+    default:
+      close();
+      return null;
+  }
 }
 
 export function useDetail() {
@@ -94,6 +116,8 @@ function describe(t: DetailTarget, data: ReturnType<typeof useDashboardData>): {
       return { title: "Laporan Panen 7 Hari Terakhir", subtitle: "Volume dan nilai per komoditas", size: "lg" };
     case "hotline":
       return { title: HOTLINE_BUMDES.nama, subtitle: HOTLINE_BUMDES.jam };
+    case "tarik-saldo":
+      return { title: "Tarik Saldo" };
     case "form-komoditas": {
       const k = t.id ? data.komoditas.find((x) => x.id === t.id) : undefined;
       return k
@@ -128,7 +152,7 @@ function describe(t: DetailTarget, data: ReturnType<typeof useDashboardData>): {
 function renderBody(t: DetailTarget) {
   switch (t.type) {
     case "pesanan":
-      return <PesananContent id={t.id} />;
+      return null; // tampil sebagai panel samping (lihat renderDrawer)
     case "komoditas":
       return <KomoditasContent id={t.id} />;
     case "kategori":
@@ -146,7 +170,8 @@ function renderBody(t: DetailTarget) {
     case "hotline":
       return <HotlineContent />;
     case "form-komoditas":
-      return <KomoditasForm id={t.id} />;
+    case "tarik-saldo":
+      return null; // tampil sebagai panel samping (lihat renderDrawer)
     case "impor-ekspor":
       return <ImporEksporContent />;
     case "nota":
