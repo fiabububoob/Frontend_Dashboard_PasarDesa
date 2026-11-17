@@ -13,12 +13,20 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   if (!user) redirect("/sesi-berakhir");
 
   return (
+<<<<<<< HEAD
     <AppProviders profilAwal={{ nama: user.nama, jabatan: user.jabatan, foto: user.foto }}>
+=======
+    <AppProviders>
+>>>>>>> origin/main
       <div className="flex h-screen overflow-hidden bg-canvas">
         <Sidebar />
         <div className="flex flex-1 flex-col overflow-hidden">
           <Topbar />
+<<<<<<< HEAD
           <main className="flex-1 overflow-y-auto px-4 pb-10 pt-6 lg:px-8">
+=======
+          <main className="flex-1 overflow-y-auto px-4 py-6 lg:px-8">
+>>>>>>> origin/main
             <div className="mx-auto max-w-[1400px] space-y-6">{children}</div>
           </main>
         </div>
