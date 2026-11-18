@@ -11,6 +11,8 @@ import { getUser } from "@/lib/server/session";
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const user = await getUser();
   if (!user) redirect("/sesi-berakhir");
+  // Dashboard khusus admin BUMDes; akun biasa (mis. pembeli aplikasi mobile) dikeluarkan.
+  if (user.role !== "admin") redirect("/sesi-berakhir");
 
   return (
     <AppProviders profilAwal={{ nama: user.nama, jabatan: user.jabatan, foto: user.foto }}>
@@ -18,7 +20,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         <Sidebar />
         <div className="flex flex-1 flex-col overflow-hidden">
           <Topbar />
-          <main className="flex-1 overflow-y-auto px-4 py-6 lg:px-8">
+          <main className="flex-1 overflow-y-auto px-4 pb-10 pt-6 lg:px-8">
             <div className="mx-auto max-w-[1400px] space-y-6">{children}</div>
           </main>
         </div>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { KeyRound, LayoutGrid, Lock } from "lucide-react";
-import { AuthShell, AuthHeader, AuthFooterLink, BrandPill, ShieldBadge, StatusPill, Wordmark } from "@/components/auth/AuthShell";
+import { AuthShell, AuthHeader, BrandPill, ShieldBadge, StatusPill, Wordmark } from "@/components/auth/AuthShell";
 import { LoginForm } from "@/components/auth/LoginForm";
 
 export const metadata: Metadata = { title: "Login Admin — PasarDesa" };
@@ -39,8 +39,6 @@ export default function LoginPage() {
       <div className="my-5 border-t border-line" />
 
       <LoginForm />
-
-      <AuthFooterLink prompt="Belum memiliki akun Pengelola?" href="/register" label="Daftar Akun Admin" />
     </AuthShell>
   );
 }
