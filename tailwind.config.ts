@@ -40,13 +40,8 @@ const config: Config = {
           400: "#9CA3AF",
           200: "#D8DDE3",
         },
-<<<<<<< HEAD
-        line: "#E4E9E5",
-        canvas: "#F4F6F3",
-        rupiah: "#B3261E",
-=======
         line: "#E1E5EA",
->>>>>>> origin/main
+        rupiah: "#B3261E",
         warn: { 50: "#FDF3E2", 400: "#E3A33D", 600: "#B4700C" },
         danger: { 50: "#FBEAE6", 600: "#B23B24", 700: "#9A3020", 800: "#7E2719" },
         info: { 50: "#EEF1FB", 600: "#4C5FA6" },
