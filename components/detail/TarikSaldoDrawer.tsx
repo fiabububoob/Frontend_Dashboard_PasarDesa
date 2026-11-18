@@ -8,8 +8,7 @@ import { Drawer } from "@/components/ui/Drawer";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
 import { useActionStatus } from "@/lib/hooks/useActionStatus";
-import { LATENSI, TUTUP_MODAL_SETELAH_SIMPAN_MS } from "@/lib/constants";
-import { simulateRequest } from "@/lib/fake-api";
+import { TUTUP_MODAL_SETELAH_SIMPAN_MS } from "@/lib/constants";
 import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { KAS_MIN_TARIK } from "@/lib/data/kas";
 import { formatNumber, formatRupiah } from "@/lib/format";
@@ -54,15 +53,20 @@ export function TarikSaldoDrawer() {
     });
     if (!ok) return;
 
+    let pesanGalat = "Saldo Anda tidak berubah. Silakan coba lagi.";
     const terkirim = await run(async () => {
-      await simulateRequest(LATENSI.lambat);
-      if (!ajukanPencairan(nominal, jalur)) throw new Error("Saldo tidak cukup");
+      try {
+        await ajukanPencairan(nominal, jalur);
+      } catch (e) {
+        if (e instanceof Error) pesanGalat = e.message;
+        throw e;
+      }
     });
     if (terkirim) {
       toast({ type: "success", title: "Pengajuan pencairan terkirim", description: `${formatRupiah(nominal)} sedang diproses.` });
       setTimeout(close, TUTUP_MODAL_SETELAH_SIMPAN_MS);
     } else {
-      toast({ type: "error", title: "Pengajuan gagal dikirim", description: "Saldo Anda tidak berubah. Silakan coba lagi." });
+      toast({ type: "error", title: "Pengajuan gagal dikirim", description: pesanGalat });
     }
   }
 

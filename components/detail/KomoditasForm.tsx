@@ -8,18 +8,18 @@ import {
   LangkahHargaStok,
   LangkahInfoDasar,
   LangkahPengiriman,
-  LangkahPenjual,
+  LangkahKonten,
   LangkahSpesifikasi,
 } from "@/components/komoditas/wizard/Langkah";
 import { dataDariDraft, draftDari, draftKosong, errorDraft, type DraftKomoditas } from "@/lib/komoditasForm";
 import { useDetail } from "./DetailProvider";
 import { useSimpanModal } from "./useSimpanModal";
 
-const LANGKAH = ["Info Dasar", "Harga & Stok", "Penjual & Konten", "Spesifikasi", "Pengiriman"];
+const LANGKAH = ["Info Dasar", "Harga & Stok", "Konten", "Spesifikasi", "Pengiriman"];
 const KETERANGAN = [
   "Lengkapi informasi komoditas.",
   "Isi harga dan stok komoditas.",
-  "Pilih penjual dan lengkapi konten.",
+  "Lengkapi deskripsi dan konten.",
   "Isi spesifikasi sesuai kategori.",
   "Atur pengiriman dan kebijakan.",
 ];
@@ -62,14 +62,14 @@ export function KomoditasForm({ id }: { id?: string }) {
     if (!langkahValid(langkah)) return;
     const data = dataDariDraft(draft);
     const asalPanen = data.spesifikasi?.find((s) => s.label === "Asal Panen")?.nilai;
-    data.asalBlok = data.asalBlok || asalPanen || data.penjual || "-";
+    data.asalBlok = data.asalBlok || asalPanen || "-";
     data.stokMaks = Math.max(1, data.stokMaks || 0);
-    simpan(() => {
+    simpan(async () => {
       if (awal) {
-        ubahKomoditas(awal.id, data);
+        await ubahKomoditas(awal.id, data);
         return { title: "Komoditas diperbarui", description: data.nama };
       }
-      tambahKomoditas({ ...data, tampil: !sebagaiDraft });
+      await tambahKomoditas({ ...data, tampil: !sebagaiDraft });
       return sebagaiDraft
         ? { title: "Disimpan sebagai draft", description: `${data.nama} belum tampil di katalog warga.` }
         : { title: "Komoditas dipublikasikan", description: `${data.nama} muncul di katalog warga.` };
@@ -138,7 +138,7 @@ export function KomoditasForm({ id }: { id?: string }) {
       <form ref={formRef} onSubmit={handleSubmit} noValidate={false} className="text-sm">
         {langkah === 0 && <LangkahInfoDasar {...props} />}
         {langkah === 1 && <LangkahHargaStok {...props} />}
-        {langkah === 2 && <LangkahPenjual {...props} />}
+        {langkah === 2 && <LangkahKonten {...props} />}
         {langkah === 3 && <LangkahSpesifikasi {...props} />}
         {langkah === 4 && <LangkahPengiriman {...props} />}
       </form>

@@ -26,8 +26,8 @@ export function TambahPanenForm({ initialId }: { initialId?: string }) {
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!terpilih || error || penuh) return;
-    simpan(() => {
-      tambahStok(terpilih.id, nilai, catatan.trim() || undefined);
+    simpan(async () => {
+      await tambahStok(terpilih.id, nilai, catatan.trim() || undefined);
       const stokBaru = Math.min(terpilih.stok + nilai, terpilih.stokMaks);
       return { title: "Hasil panen tercatat", description: `${terpilih.nama}: stok ${terpilih.stok} → ${stokBaru} ${terpilih.satuan}.` };
     });
