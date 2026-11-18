@@ -25,6 +25,7 @@ import { ProfilPenggunaForm } from "./ProfilPenggunaForm";
 import { KomoditasForm as KomoditasFormDrawer } from "./KomoditasForm";
 import { TarikSaldoDrawer } from "./TarikSaldoDrawer";
 import { PesananDrawer } from "@/components/pesanan/PesananDrawer";
+import { AduanDrawer } from "@/components/pengaduan/AduanDrawer";
 import type { DetailTarget } from "@/types";
 
 interface DetailApi {
@@ -69,7 +70,7 @@ export function DetailProvider({ children }: { children: ReactNode }) {
 
 // Form dan detail utama tampil sebagai panel samping kanan; sisanya tetap modal di tengah layar.
 function isDrawer(t: DetailTarget) {
-  return t.type === "form-komoditas" || t.type === "tarik-saldo" || t.type === "pesanan";
+  return t.type === "form-komoditas" || t.type === "tarik-saldo" || t.type === "pesanan" || t.type === "aduan";
 }
 
 function renderDrawer(t: DetailTarget, kedalaman: number, close: () => void) {
@@ -78,6 +79,8 @@ function renderDrawer(t: DetailTarget, kedalaman: number, close: () => void) {
       return <KomoditasFormDrawer key={`${kedalaman}-${t.id ?? "baru"}`} id={t.id} />;
     case "tarik-saldo":
       return <TarikSaldoDrawer key={kedalaman} />;
+    case "aduan":
+      return <AduanDrawer key={`${kedalaman}-${t.id}`} id={t.id} />;
     case "pesanan":
       return <PesananDrawer key={`${kedalaman}-${t.id}`} id={t.id} />;
     default:
@@ -118,6 +121,8 @@ function describe(t: DetailTarget, data: ReturnType<typeof useDashboardData>): {
       return { title: HOTLINE_BUMDES.nama, subtitle: HOTLINE_BUMDES.jam };
     case "tarik-saldo":
       return { title: "Tarik Saldo" };
+    case "aduan":
+      return { title: `Tiket #${t.id}` };
     case "form-komoditas": {
       const k = t.id ? data.komoditas.find((x) => x.id === t.id) : undefined;
       return k

@@ -28,13 +28,20 @@ function AntreanRow({ pesanan, index, onDone }: { pesanan: Pesanan; index: numbe
   const sudahSiap = pesanan.status !== "perlu-dikemas";
 
   async function handleSiapkan() {
-    const ok = await run(() => simulateRequest(LATENSI.normal));
+    let galat = "Coba lagi sebentar lagi.";
+    const ok = await run(async () => {
+      try {
+        await siapkanPaket(pesanan.id);
+      } catch (e) {
+        if (e instanceof Error && e.message) galat = e.message;
+        throw e;
+      }
+    });
     if (ok) {
-      siapkanPaket(pesanan.id);
       onDone(pesanan.id);
       toast({ type: "success", title: "Paket siap di rak", description: `#${pesanan.id} menunggu kurir desa.` });
     } else {
-      toast({ type: "error", title: "Gagal menyiapkan paket", description: "Coba lagi sebentar lagi." });
+      toast({ type: "error", title: "Gagal menyiapkan paket", description: galat });
     }
   }
 

@@ -82,10 +82,24 @@ export function ImporEksporContent() {
     else setHasil(r);
   }
 
-  function impor() {
+  // Disimpan satu per satu ke server (urut, agar SKU tidak bentrok). Berhenti di baris pertama yang gagal.
+  async function impor() {
     if (!hasil?.valid.length) return;
-    hasil.valid.forEach(tambahKomoditas);
-    toast({ type: "success", title: "Impor selesai", description: `${hasil.valid.length} komoditas ditambahkan.` });
+    let berhasil = 0;
+    try {
+      for (const baris of hasil.valid) {
+        await tambahKomoditas(baris);
+        berhasil += 1;
+      }
+    } catch (e) {
+      toast({
+        type: "error",
+        title: `Impor berhenti di baris ke-${berhasil + 1}`,
+        description: `${berhasil} komoditas sudah tersimpan. ${e instanceof Error ? e.message : ""}`.trim(),
+      });
+      return;
+    }
+    toast({ type: "success", title: "Impor selesai", description: `${berhasil} komoditas ditambahkan.` });
     close();
   }
 
