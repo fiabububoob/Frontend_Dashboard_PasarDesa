@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -8,7 +7,6 @@ import { Chip } from "@/components/ui/Chip";
 import { fieldClass } from "@/components/ui/formStyles";
 import { FotoUploader } from "@/components/komoditas/FotoUploader";
 import { SpesifikasiEditor } from "@/components/komoditas/SpesifikasiEditor";
-import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { BADGE_PRODUK } from "@/lib/data/badgeProduk";
 import { KATEGORI_INDUK } from "@/lib/data/kategori";
 import {
@@ -175,24 +173,11 @@ export function LangkahHargaStok({ draft, update, error }: LangkahProps) {
 }
 
 // ---------------------------------------------------------------------------
-// 3. Penjual & Konten
+// 3. Konten
 // ---------------------------------------------------------------------------
-export function LangkahPenjual({ draft, update }: LangkahProps) {
-  const { komoditas } = useDashboardData();
-  const daftarPenjual = useMemo(() => Array.from(new Set(komoditas.map((k) => k.penjual ?? k.asalBlok))), [komoditas]);
-
+export function LangkahKonten({ draft, update }: LangkahProps) {
   return (
     <div className="space-y-5">
-      <Field label="Nama penjual" htmlFor="kmd-penjual" required>
-        <Select id="kmd-penjual" required value={draft.penjual} onChange={(e) => update({ penjual: e.target.value })}>
-          <Pilih>Pilih penjual</Pilih>
-          {denganNilai(daftarPenjual, draft.penjual).map((p) => (
-            <option key={p}>{p}</option>
-          ))}
-        </Select>
-      </Field>
-      <p className="rounded-xl border border-brand-200 bg-brand-50 px-3.5 py-2.5 text-sm text-brand-900">Alamat dan status verifikasi terisi otomatis dari data penjual.</p>
-
       <Field label="Deskripsi singkat" htmlFor="kmd-deskripsi" required hint="Maks. 160 karakter">
         <Input id="kmd-deskripsi" required maxLength={160} value={draft.deskripsi} onChange={(e) => update({ deskripsi: e.target.value.slice(0, MAKS_DESKRIPSI) })} placeholder="Tampil di kartu produk" />
       </Field>

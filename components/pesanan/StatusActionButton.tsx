@@ -4,9 +4,8 @@ import { Button } from "@/components/ui/Button";
 import { useConfirm, type ConfirmOptions } from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
 import { useDashboardData } from "@/components/providers/DashboardDataProvider";
-import { LATENSI, MODE_DEMO } from "@/lib/constants";
+import { MODE_DEMO } from "@/lib/constants";
 import { useActionStatus } from "@/lib/hooks/useActionStatus";
-import { simulateRequest } from "@/lib/fake-api";
 import { buatKomplainContoh, bisaDikomplain } from "@/lib/komplain";
 import { langkahBerikutnya, type PeranPesanan } from "@/lib/pesanan";
 import type { Pesanan, StatusPesanan } from "@/types";
@@ -104,9 +103,13 @@ export function StatusActionButton({ pesanan }: { pesanan: Pesanan }) {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => {
-              setStatusPesanan(pesanan.id, langkah.ke);
-              toast({ type: "info", title: SIMULASI[oleh].judul, description: SIMULASI[oleh].deskripsi });
+            onClick={async () => {
+              try {
+                await setStatusPesanan(pesanan.id, langkah.ke);
+                toast({ type: "info", title: SIMULASI[oleh].judul, description: SIMULASI[oleh].deskripsi });
+              } catch (e) {
+                toast({ type: "error", title: "Gagal memperbarui status", description: e instanceof Error ? e.message : undefined });
+              }
             }}
           >
             {SIMULASI[oleh].tombol} (mode pengembangan)
@@ -116,10 +119,14 @@ export function StatusActionButton({ pesanan }: { pesanan: Pesanan }) {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => {
+            onClick={async () => {
               const urutan = semuaPesanan.filter((p) => p.komplain).length + 1;
-              ajukanKomplain(pesanan.id, buatKomplainContoh(pesanan, new Date(), urutan));
-              toast({ type: "info", title: "Simulasi: pembeli mengajukan komplain", description: "Dana pesanan ditahan sampai komplain selesai." });
+              try {
+                await ajukanKomplain(pesanan.id, buatKomplainContoh(pesanan, new Date(), urutan));
+                toast({ type: "info", title: "Simulasi: pembeli mengajukan komplain", description: "Dana pesanan ditahan sampai komplain selesai." });
+              } catch (e) {
+                toast({ type: "error", title: "Gagal mengajukan komplain", description: e instanceof Error ? e.message : undefined });
+              }
             }}
           >
             Simulasi pembeli: ajukan komplain (mode pengembangan)
@@ -134,12 +141,19 @@ export function StatusActionButton({ pesanan }: { pesanan: Pesanan }) {
     const ok = await confirm(info.konfirmasi);
     if (!ok) return;
 
-    const saved = await run(() => simulateRequest(LATENSI.normal));
+    let galat = "Periksa koneksi lalu coba lagi.";
+    const saved = await run(async () => {
+      try {
+        await setStatusPesanan(pesanan.id, langkah.ke);
+      } catch (e) {
+        if (e instanceof Error && e.message) galat = e.message;
+        throw e;
+      }
+    });
     if (saved) {
-      setStatusPesanan(pesanan.id, langkah.ke);
       toast({ type: "success", ...info.toast });
     } else {
-      toast({ type: "error", title: "Gagal memperbarui status", description: "Periksa koneksi lalu coba lagi." });
+      toast({ type: "error", title: "Gagal memperbarui status", description: galat });
     }
   }
 

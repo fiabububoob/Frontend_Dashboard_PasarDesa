@@ -6,6 +6,8 @@ import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { useDetail } from "@/components/detail/DetailProvider";
 import { StatusBadge } from "./StatusBadge";
 import { StatusActionButton } from "./StatusActionButton";
+import { Bintang } from "@/components/ui/Bintang";
+import { tanggalWib } from "@/lib/kasApi";
 import { KomplainPanel } from "./detail/KomplainPanel";
 import { WARNA_TILE } from "@/components/komoditas/tampilan";
 import { ONGKIR_FLAT, SUBSIDI_ONGKIR, TANGGAL_DATA_DUMMY } from "@/lib/constants";
@@ -15,6 +17,13 @@ import { useSekarang } from "@/lib/hooks/useSekarang";
 import { langkahBerikutnya, LABEL_METODE_BAYAR, sisaWaktuPelepasan, sudahLunas } from "@/lib/pesanan";
 import { cariKomoditasByNama } from "@/lib/stok";
 import type { Pesanan, StatusPesanan } from "@/types";
+
+const LABEL_PEMBATAL = { pembeli: "pembeli", admin: "admin", sistem: "sistem" } as const;
+
+const waktuWib = (iso: string) => {
+  const { tanggal, waktu } = tanggalWib(iso);
+  return `${tanggal}, ${waktu}`;
+};
 
 const LANGKAH = ["Diterima", "Sedang Dikemas", "Kurir Menjemput", "Drop-Point"];
 
@@ -188,6 +197,38 @@ export function PesananDrawer({ id }: { id: string }) {
         </div>
 
         {p.catatan && <p className="rounded-xl bg-surface-muted p-3 text-sm italic text-ink-500">&ldquo;{p.catatan}&rdquo;</p>}
+
+        {p.status === "dibatalkan" && (
+          <section className="rounded-xl border border-warn-400/40 bg-[#FFF6DB] p-4 text-sm text-[#7A4B00]">
+            <p className="font-bold">{p.dibatalkanOleh ? `Dibatalkan oleh ${LABEL_PEMBATAL[p.dibatalkanOleh]}` : "Pesanan dibatalkan"}</p>
+            {p.alasanBatal && <p className="mt-1">Alasan: {p.alasanBatal}</p>}
+            {p.dibatalkanPada && <p className="mt-1 text-xs opacity-80">{waktuWib(p.dibatalkanPada)}</p>}
+            <p className="mt-2 text-xs">Stok komoditas sudah dikembalikan otomatis dan tidak ada dana yang masuk ke kas.</p>
+          </section>
+        )}
+
+        {p.ulasan && (
+          <section className="rounded-xl border border-line p-4 text-sm">
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-bold text-ink-900">Ulasan pembeli</p>
+              <Bintang nilai={p.ulasan.rating} />
+            </div>
+            {p.ulasan.tags.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {p.ulasan.tags.map((t) => (
+                  <span key={t} className="rounded-full border border-brand-200 bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
+                    {t}
+                  </span>
+                ))}
+              </div>
+            )}
+            {p.ulasan.catatan && <p className="mt-2 text-ink-700">&ldquo;{p.ulasan.catatan}&rdquo;</p>}
+            <p className="mt-2 text-xs text-ink-500">
+              {waktuWib(p.ulasan.dibuatPada)}
+              {p.ulasan.kurirDisukai ? " · Kurir disukai pembeli" : ""}
+            </p>
+          </section>
+        )}
 
         {p.komplain && <KomplainPanel key={`${p.id}-${p.komplain.status}`} pesanan={p} />}
 

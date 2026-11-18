@@ -149,7 +149,7 @@ export function TransaksiTable() {
                     {formatRupiah(Math.abs(trx.nominal))}
                   </td>
                   <td className="px-5 py-4">
-                    <Badge tone={mutasiBelumFinal(trx.status) ? "warning" : /Ditransfer|Dicairkan/.test(trx.status) ? "neutral" : "success"}>{trx.status}</Badge>
+                    <Badge tone={mutasiBelumFinal(trx.status) ? "warning" : /Ditransfer|Dicairkan|Dikoreksi/.test(trx.status) ? "neutral" : "success"}>{trx.status}</Badge>
                   </td>
                 </tr>
               ))}

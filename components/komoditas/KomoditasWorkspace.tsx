@@ -15,7 +15,7 @@ import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { useDetail } from "@/components/detail/DetailProvider";
 import { KATEGORI_INDUK } from "@/lib/data/kategori";
 import { LABEL_JENIS_SUMBER, OPSI_KETERSEDIAAN } from "@/lib/data/komoditasOpsi";
-import { ketersediaanDari, hitungStatusTampilan, indukNama, LABEL_STATUS_TAMPILAN, penjualDari, statusTampilan, sumberDari, type StatusTampilan } from "@/lib/komoditas";
+import { ketersediaanDari, hitungStatusTampilan, indukNama, LABEL_STATUS_TAMPILAN, statusTampilan, sumberDari, type StatusTampilan } from "@/lib/komoditas";
 import { usePaginasi } from "@/lib/hooks/usePaginasi";
 import { cocokSemuaKata } from "@/lib/text";
 
@@ -33,7 +33,7 @@ type Tampilan = "list" | "grid";
 // Halaman daftar komoditas: tab status, toolbar filter, tampilan daftar/kartu. Semua dihitung dari
 // data hidup, jadi menambah/mengubah komoditas langsung terlihat di tab dan hitungannya.
 export function KomoditasWorkspace() {
-  const { komoditas } = useDashboardData();
+  const { komoditas, statusKomoditas, galatKomoditas, muatKomoditas } = useDashboardData();
   const { open } = useDetail();
 
   const [tab, setTab] = useState(TAB_SEMUA);
@@ -53,7 +53,7 @@ export function KomoditasWorkspace() {
         if (induk && indukNama(k) !== induk) return false;
         if (sumber && sumberDari(k) !== sumber) return false;
         if (ketersediaan && ketersediaanDari(k) !== ketersediaan) return false;
-        return cocokSemuaKata(query, k.nama, k.sku, k.kategori, indukNama(k), penjualDari(k), k.tag);
+        return cocokSemuaKata(query, k.nama, k.sku, k.kategori, indukNama(k), k.asalBlok, k.tag);
       }),
     [komoditas, statusAktif, induk, sumber, ketersediaan, query],
   );
@@ -118,6 +118,17 @@ export function KomoditasWorkspace() {
           </>
         }
       />
+
+      {statusKomoditas === "gagal" && (
+        <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-warn-400/40 bg-[#FFF6DB] px-4 py-3 text-sm text-[#7A4B00]">
+          <p>
+            <span className="font-semibold">Data komoditas belum tersambung ke server.</span> Yang tampil adalah data contoh{galatKomoditas ? ` (${galatKomoditas})` : ""}. Perubahan tidak bisa disimpan sementara.
+          </p>
+          <Button variant="secondary" size="sm" onClick={() => void muatKomoditas()}>
+            Coba lagi
+          </Button>
+        </div>
+      )}
 
       <Card className="overflow-hidden p-0">
         <UnderlineTabs options={tabs} active={tab} onChange={setTab} />

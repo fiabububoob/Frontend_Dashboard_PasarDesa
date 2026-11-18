@@ -37,10 +37,14 @@ export function MenuAksiKomoditas({ k }: { k: Komoditas }) {
             type="button"
             role="menuitem"
             className={ITEM}
-            onClick={() => {
-              setTampil(k.id, !k.tampil);
-              toast({ type: "success", title: k.tampil ? "Disembunyikan dari katalog warga" : "Ditampilkan di katalog warga", description: k.nama });
+            onClick={async () => {
               tutup();
+              try {
+                await setTampil(k.id, !k.tampil);
+                toast({ type: "success", title: k.tampil ? "Disembunyikan dari katalog warga" : "Ditampilkan di katalog warga", description: k.nama });
+              } catch (e) {
+                toast({ type: "error", title: "Gagal mengubah status", description: e instanceof Error ? e.message : undefined });
+              }
             }}
           >
             {k.tampil ? <EyeOff className="h-4 w-4 text-ink-400" aria-hidden /> : <Eye className="h-4 w-4 text-ink-400" aria-hidden />}

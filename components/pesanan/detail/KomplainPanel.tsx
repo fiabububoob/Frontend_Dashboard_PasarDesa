@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { clsx } from "clsx";
 import { Badge, type BadgeTone } from "@/components/ui/Badge";
+import { FotoGaleri } from "@/components/ui/FotoGaleri";
 import { Button } from "@/components/ui/Button";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
@@ -55,12 +56,19 @@ export function KomplainPanel({ pesanan }: { pesanan: Pesanan }) {
       confirmLabel: "Ya, Selesaikan",
     });
     if (!ok) return;
-    const saved = await run(() => simulateRequest(LATENSI.normal));
+    let galat = "Periksa koneksi lalu coba lagi.";
+    const saved = await run(async () => {
+      try {
+        await selesaikanKomplain(pesanan.id, pilihan);
+      } catch (e) {
+        if (e instanceof Error && e.message) galat = e.message;
+        throw e;
+      }
+    });
     if (!saved) {
-      toast({ type: "error", title: "Gagal menyelesaikan komplain", description: "Periksa koneksi lalu coba lagi." });
+      toast({ type: "error", title: "Gagal menyelesaikan komplain", description: galat });
       return;
     }
-    selesaikanKomplain(pesanan.id, pilihan);
     toast({
       type: "success",
       title: "Komplain diselesaikan",
@@ -76,8 +84,12 @@ export function KomplainPanel({ pesanan }: { pesanan: Pesanan }) {
       tone: "danger",
     });
     if (!ok) return;
-    teruskanKomplain(pesanan.id);
-    toast({ type: "info", title: "Komplain diteruskan ke BUMDes" });
+    try {
+      await teruskanKomplain(pesanan.id);
+      toast({ type: "info", title: "Komplain diteruskan ke BUMDes" });
+    } catch (e) {
+      toast({ type: "error", title: "Gagal meneruskan komplain", description: e instanceof Error ? e.message : undefined });
+    }
   }
 
   return (
@@ -95,14 +107,7 @@ export function KomplainPanel({ pesanan }: { pesanan: Pesanan }) {
       </div>
 
       {komplain.foto.length > 0 ? (
-        <ul className="flex flex-wrap gap-2">
-          {komplain.foto.map((src, i) => (
-            <li key={i}>
-              {/* eslint-disable-next-line @next/next/no-img-element -- foto bukti dari pembeli */}
-              <img src={src} alt={`Bukti komplain ${i + 1}`} className="h-16 w-16 rounded-lg border border-line object-cover" />
-            </li>
-          ))}
-        </ul>
+        <FotoGaleri foto={komplain.foto} ukuran="h-20 w-20" alt="Bukti komplain" />
       ) : (
         <p className="text-xs text-ink-400">Pembeli tidak melampirkan foto.</p>
       )}
@@ -164,9 +169,13 @@ export function KomplainPanel({ pesanan }: { pesanan: Pesanan }) {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => {
-                selesaikanKomplain(pesanan.id, komplain.items.map(() => "refund"));
-                toast({ type: "info", title: "Simulasi: BUMDes memutuskan refund semua item" });
+              onClick={async () => {
+                try {
+                  await selesaikanKomplain(pesanan.id, komplain.items.map(() => "refund"));
+                  toast({ type: "info", title: "Simulasi: BUMDes memutuskan refund semua item" });
+                } catch (e) {
+                  toast({ type: "error", title: "Gagal menyelesaikan komplain", description: e instanceof Error ? e.message : undefined });
+                }
               }}
             >
               Simulasi admin BUMDes: refund semua item (mode pengembangan)
