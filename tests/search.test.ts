@@ -17,7 +17,7 @@ describe("cari", () => {
   });
   it("menemukan pesanan lewat nama pembeli", () => {
     const hasil = cari("joko", DATA).find((h) => h.grup === "Pesanan");
-    expect(hasil?.target).toEqual({ type: "pesanan", id: "PSD-20231024-0089" });
+    expect(hasil?.target).toEqual({ type: "pesanan", id: "PSD-20261024-0089" });
   });
   it("menemukan sub-kategori lewat nama sub maupun nama kategori besarnya", () => {
     expect(cari("telur", DATA).some((h) => h.grup === "Kategori")).toBe(true);

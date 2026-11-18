@@ -15,7 +15,6 @@ export const PRE_ORDER_SAAT_INI = { jumlah: 1, estimasi: "Estimasi 14 hari" };
 export const KOMODITAS_LIST: Komoditas[] = [
   {
     id: "SKR-PND-05",
-    penjual: "Kel. Tani Makmur Sejahtera",
     terjual: 340,
     ketersediaan: "Siap kirim",
     sku: "SKR-PND-05",
@@ -49,7 +48,6 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-JGN-01",
-    penjual: "Kel. Tani Krajan",
     terjual: 156,
     ketersediaan: "Siap kirim",
     sku: "SKR-JGN-01",
@@ -72,7 +70,6 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-CBI-05",
-    penjual: "Kel. Tani Krajan",
     terjual: 98,
     ketersediaan: "Siap kirim",
     sku: "SKR-CBI-05",
@@ -96,7 +93,6 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-BWG-01",
-    penjual: "Kel. Tani Tegalrejo",
     terjual: 74,
     ketersediaan: "Siap kirim",
     sku: "SKR-BWG-01",
@@ -116,7 +112,6 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-TLR-10",
-    penjual: "Kandang Pak RT",
     terjual: 64,
     ketersediaan: "Panen pagi",
     sku: "SKR-TLR-10",
@@ -137,7 +132,6 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-BRM-05",
-    penjual: "Kel. Tani Makmur Sejahtera",
     terjual: 121,
     ketersediaan: "Siap kirim",
     sku: "SKR-BRM-05",
@@ -158,7 +152,6 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-GBH-25",
-    penjual: "Kel. Tani Makmur Sejahtera",
     terjual: 38,
     ketersediaan: "Siap kirim",
     sku: "SKR-GBH-25",
@@ -178,7 +171,6 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-KGK-01",
-    penjual: "Kel. Tani Krajan",
     terjual: 112,
     ketersediaan: "Panen pagi",
     sku: "SKR-KGK-01",
@@ -198,7 +190,6 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-TMT-01",
-    penjual: "Kel. Tani Krajan",
     terjual: 87,
     ketersediaan: "Siap kirim",
     sku: "SKR-TMT-01",
@@ -219,7 +210,6 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-KDL-01",
-    penjual: "Kel. Tani Timur",
     terjual: 45,
     ketersediaan: "Siap kirim",
     sku: "SKR-KDL-01",
@@ -239,7 +229,6 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-AYM-01",
-    penjual: "Kandang Pak RT",
     terjual: 52,
     ketersediaan: "Siap kirim",
     sku: "SKR-AYM-01",
@@ -260,7 +249,6 @@ export const KOMODITAS_LIST: Komoditas[] = [
   },
   {
     id: "SKR-TLB-06",
-    penjual: "Kandang Pak RT",
     terjual: 29,
     ketersediaan: "Siap kirim",
     sku: "SKR-TLB-06",

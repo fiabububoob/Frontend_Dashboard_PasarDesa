@@ -1,9 +1,9 @@
-import type { DetailTarget, Komoditas, Pesanan } from "@/types";
+import type { Aduan, DetailTarget, Komoditas, Pesanan } from "@/types";
 import { JAM_JEMPUT_SORE } from "./constants";
 import { KURIR_AKTIF, WARTA_LIST } from "./data/ringkasan";
 import { hitungStatus } from "./pesanan";
 
-export type JenisNotifikasi = "komplain" | "dikemas" | "stok-kritis" | "kurir" | "pengumuman";
+export type JenisNotifikasi = "komplain" | "aduan" | "batal" | "dikemas" | "stok-kritis" | "kurir" | "pengumuman";
 
 export interface Notifikasi {
   key: string;
@@ -16,7 +16,10 @@ export interface Notifikasi {
 
 // Notifikasi dihitung dari data hidup (bukan daftar tetap), jadi ikut berubah
 // saat stok atau status pesanan berubah. Fungsi murni → mudah diuji.
-export function buatNotifikasi(data: { pesanan: Pesanan[]; komoditas: Komoditas[] }): Notifikasi[] {
+const BATAS_NOTIF_BATAL_MS = 24 * 60 * 60 * 1000;
+
+// `sekarang` (opsional) dipakai untuk notifikasi yang punya masa tampil, mis. pembatalan 24 jam terakhir.
+export function buatNotifikasi(data: { pesanan: Pesanan[]; komoditas: Komoditas[]; sekarang?: Date; aduan?: Aduan[] }): Notifikasi[] {
   const hasil: Notifikasi[] = [];
 
   const komplain = data.pesanan.filter((p) => p.komplain?.status === "diajukan");
@@ -27,6 +30,34 @@ export function buatNotifikasi(data: { pesanan: Pesanan[]; komoditas: Komoditas[
       judul: `${komplain.length} komplain perlu ditangani`,
       keterangan: "Dana pesanan ditahan sampai komplain selesai",
       target: { type: "pesanan", id: komplain[0].id },
+    });
+  }
+
+  // Pembeli membatalkan pesanan lewat aplikasi: admin perlu tahu (stok sudah otomatis kembali).
+  const batalPembeli = data.sekarang
+    ? data.pesanan.filter(
+        (p) => p.dibatalkanOleh === "pembeli" && p.dibatalkanPada && data.sekarang!.getTime() - new Date(p.dibatalkanPada).getTime() < BATAS_NOTIF_BATAL_MS,
+      )
+    : [];
+  if (batalPembeli.length > 0) {
+    hasil.push({
+      key: "batal-pembeli",
+      jenis: "batal",
+      judul: `${batalPembeli.length} pesanan dibatalkan pembeli`,
+      keterangan: batalPembeli[0].alasanBatal ? `Alasan: ${batalPembeli[0].alasanBatal}` : "Stok sudah dikembalikan otomatis",
+      target: { type: "pesanan", id: batalPembeli[0].id },
+    });
+  }
+
+  // Tiket aduan umum yang masih "Sedang Diverifikasi" (dari Pusat Bantuan aplikasi mobile).
+  const aduanBaru = (data.aduan ?? []).filter((a) => a.status === "diverifikasi");
+  if (aduanBaru.length > 0) {
+    hasil.push({
+      key: "aduan-baru",
+      jenis: "aduan",
+      judul: `${aduanBaru.length} tiket aduan baru`,
+      keterangan: `${aduanBaru[0].topik} · target tindak lanjut 1×24 jam`,
+      target: { type: "aduan", id: aduanBaru[0].id },
     });
   }
 

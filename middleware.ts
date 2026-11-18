@@ -1,11 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const HALAMAN_AUTH = ["/login", "/register", "/lupa-password"];
+const HALAMAN_AUTH = ["/login", "/lupa-password"];
 const NAMA_COOKIE_SESI = "pasardesa_token"; // harus sama dengan lib/server/session.ts
 
 // Gerbang pertama, hanya memeriksa KEBERADAAN cookie (keabsahan token dinilai layout dashboard):
 //   • belum punya cookie  + membuka halaman dashboard → ke /login
-//   • sudah punya cookie  + membuka login/register    → ke /
+//   • sudah punya cookie  + membuka login/lupa-password → ke /
 // Cookie yang ternyata kedaluwarsa/tidak valid dibereskan layout dashboard dengan mengirim user ke
 // /sesi-berakhir, yang MENGHAPUS cookie itu lalu ke /login. Karena cookie dihapus, rantai redirect
 // selalu berhenti di /login dan tidak mungkin berputar.

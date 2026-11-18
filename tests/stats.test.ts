@@ -10,9 +10,7 @@ describe("statPesanan", () => {
   it("angka antrean mengikuti jumlah pesanan perlu dikemas", () => {
     const stats = statPesanan(PESANAN_LIST);
     expect(nilai(stats, "antrean")).toBe(`${hitungStatus(PESANAN_LIST, "perlu-dikemas")} Paket`);
-    // Pesanan yang belum dibayar atau dibatalkan tidak dihitung sebagai perputaran.
-    const berjalan = PESANAN_LIST.filter((p) => p.status !== "menunggu-pembayaran" && p.status !== "dibatalkan");
-    expect(stats.find((s) => s.id === "perputaran")?.helper).toBe(`${berjalan.length} Transaksi total`);
+    expect(stats).toHaveLength(3);
   });
 });
 

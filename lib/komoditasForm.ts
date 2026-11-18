@@ -26,7 +26,6 @@ export interface DraftKomoditas {
   badge: BadgeProduk[];
   tanggalPanen: string;
   sumber: SumberKomoditas;
-  penjual: string;
   ketersediaan: string;
   batasStokRendah: string;
   minBeli: string;
@@ -78,7 +77,6 @@ export function draftKosong(sekarang: Date): DraftKomoditas {
     badge: [],
     tanggalPanen: isoTanggal(sekarang),
     sumber: "Petani",
-    penjual: "",
     ketersediaan: "Siap kirim",
     batasStokRendah: "10",
     minBeli: "1",
@@ -121,7 +119,6 @@ export function draftDari(k: Komoditas): DraftKomoditas {
     badge: k.badge ?? [],
     tanggalPanen: k.tanggalPanen ?? "", // produk lama tanpa tanggal tetap memakai teks waktu panen lamanya
     sumber: sumberDari(k),
-    penjual: k.penjual ?? "",
     ketersediaan: k.ketersediaan ?? "Siap kirim",
     batasStokRendah: k.batasStokRendah === undefined ? "" : String(k.batasStokRendah),
     minBeli: k.minBeli === undefined ? "" : String(k.minBeli),
@@ -178,7 +175,6 @@ export function dataDariDraft(d: DraftKomoditas): KomoditasBaru {
     badge: d.badge,
     tanggalPanen: d.tanggalPanen || undefined,
     sumber: d.sumber,
-    penjual: teksAtauKosong(d.penjual),
     ketersediaan: teksAtauKosong(d.ketersediaan),
     batasStokRendah: angkaAtauKosong(d.batasStokRendah),
     minBeli: angkaAtauKosong(d.minBeli),

@@ -27,7 +27,8 @@ export async function apiFetch<T>(path: string, { token, headers, ...init }: Api
       cache: "no-store",
       ...init,
       headers: {
-        "Content-Type": "application/json",
+        // FormData (unggah foto): biarkan fetch mengisi Content-Type beserta boundary-nya.
+        ...(init.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...headers,
       },

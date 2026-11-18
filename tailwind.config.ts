@@ -7,9 +7,8 @@ const ms = (n: number) => `${n}ms`;
 // Design tokens for PasarDesa admin.
 //
 // Palette: hijau segar (kontras teks putih di brand-600 ≥ 4.5:1) dengan netral
-// bersih kebiruan tipis. Struktur: sidebar & topbar putih, area konten abu muda
-// ("canvas"), kartu putih ber-border + bayangan sangat tipis → batas antar
-// panel terlihat jelas tanpa terkesan berat.
+// bersih kebiruan tipis. Tampilan sengaja datar: latar putih, kartu hanya
+// ber-border tipis (tanpa bayangan), supaya konten yang jadi pusat perhatian.
 // Semantic colors (warn/danger/info) get their own ramps so status meaning
 // never overlaps with the brand color itself.
 // ---------------------------------------------------------------------------
@@ -27,7 +26,6 @@ const config: Config = {
           700: "#126B42",
           900: "#0C3F28",
         },
-        canvas: "#F4F6F8", // latar area konten di belakang kartu
         surface: {
           DEFAULT: "#FFFFFF",
           muted: "#F7F8FA",
@@ -40,7 +38,8 @@ const config: Config = {
           400: "#9CA3AF",
           200: "#D8DDE3",
         },
-        line: "#E1E5EA",
+        line: "#E4E9E5",
+        canvas: "#F4F6F3",
         rupiah: "#B3261E",
         warn: { 50: "#FDF3E2", 400: "#E3A33D", 600: "#B4700C" },
         danger: { 50: "#FBEAE6", 600: "#B23B24", 700: "#9A3020", 800: "#7E2719" },
@@ -51,7 +50,7 @@ const config: Config = {
         display: ["var(--font-jakarta)", "-apple-system", "Segoe UI", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        card: "0 1px 2px rgba(16, 24, 40, 0.05), 0 1px 3px rgba(16, 24, 40, 0.04)",
+        card: "0 1px 2px rgba(33, 31, 27, 0.04), 0 1px 3px rgba(33, 31, 27, 0.06)",
       },
       borderRadius: { xl: "12px", "2xl": "16px" },
 

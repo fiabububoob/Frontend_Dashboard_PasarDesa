@@ -58,6 +58,15 @@ export interface Komplain {
   items: KomplainItem[];
 }
 
+export interface UlasanPesanan {
+  /** 1–5. */
+  rating: number;
+  tags: string[];
+  catatan?: string;
+  kurirDisukai?: boolean;
+  dibuatPada: string;
+}
+
 // Satu pesanan = bagian milik SATU penjual dari keranjang pembeli (keranjang bisa berisi beberapa penjual).
 export interface Pesanan {
   id: string;
@@ -85,6 +94,12 @@ export interface Pesanan {
   komplain?: Komplain;
   /** True bila pesanan dikirim ulang sebagai barang pengganti (bebas biaya) setelah komplain. */
   kirimUlang?: boolean;
+  /** Jejak pembatalan: siapa yang membatalkan, alasannya, dan waktunya (ISO). */
+  dibatalkanOleh?: "pembeli" | "admin" | "sistem";
+  alasanBatal?: string;
+  dibatalkanPada?: string;
+  /** Ulasan pembeli setelah pesanan selesai (satu per pesanan). */
+  ulasan?: UlasanPesanan;
 }
 
 // Tab filter di halaman Pesanan; `status: null` = semua pesanan.

@@ -9,6 +9,7 @@ export * from "./ui";
 export * from "./kategori";
 export * from "./komoditas";
 export * from "./pesanan";
+export * from "./aduan";
 export * from "./kas";
 export * from "./pengaturan";
 export * from "./detail";

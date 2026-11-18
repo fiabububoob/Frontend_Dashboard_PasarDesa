@@ -12,6 +12,7 @@ export interface Warta {
 // notifikasi, dan tombol-tombol di halaman → useDetail().open({ type, ... }).
 export type DetailTarget =
   | { type: "pesanan"; id: string }
+  | { type: "aduan"; id: string }
   | { type: "komoditas"; id: string }
   | { type: "kategori"; nama: string }
   | { type: "kurir" }
