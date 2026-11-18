@@ -2,14 +2,17 @@
 
 import { useMemo, useState } from "react";
 import { clsx } from "clsx";
-import { AlertTriangle, Bell, Bike, Megaphone, Package, type LucideIcon } from "lucide-react";
+import { AlertTriangle, Bell, Bike, Flag, Megaphone, Package, XCircle, type LucideIcon } from "lucide-react";
 import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { useDetail } from "@/components/detail/DetailProvider";
+import { useSekarang } from "@/lib/hooks/useSekarang";
 import { buatNotifikasi, type JenisNotifikasi } from "@/lib/notifikasi";
 import { Popover } from "./Popover";
 
 const TAMPILAN: Record<JenisNotifikasi, { icon: LucideIcon; warna: string }> = {
   komplain: { icon: AlertTriangle, warna: "text-danger-600" },
+  batal: { icon: XCircle, warna: "text-warn-600" },
+  aduan: { icon: Flag, warna: "text-danger-600" },
   dikemas: { icon: Package, warna: "text-warn-600" },
   "stok-kritis": { icon: AlertTriangle, warna: "text-danger-600" },
   kurir: { icon: Bike, warna: "text-brand-600" },
@@ -17,10 +20,11 @@ const TAMPILAN: Record<JenisNotifikasi, { icon: LucideIcon; warna: string }> = {
 };
 
 export function NotificationMenu() {
-  const { komoditas, pesanan } = useDashboardData();
+  const { komoditas, pesanan, aduan } = useDashboardData();
   const { open } = useDetail();
   const [sudahDibaca, setSudahDibaca] = useState(false);
-  const notifikasi = useMemo(() => buatNotifikasi({ pesanan, komoditas }), [pesanan, komoditas]);
+  const sekarang = useSekarang();
+  const notifikasi = useMemo(() => buatNotifikasi({ pesanan, komoditas, sekarang: sekarang ?? undefined, aduan }), [pesanan, komoditas, sekarang, aduan]);
 
   return (
     <Popover

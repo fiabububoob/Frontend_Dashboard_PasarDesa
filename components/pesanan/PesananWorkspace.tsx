@@ -28,7 +28,7 @@ const UKURAN_HALAMAN_PESANAN = 6;
 // Halaman Pesanan: statistik, tab status, pencarian, dan tabel. Semua angka dihitung dari data hidup,
 // jadi mengubah status pesanan (di panel detail) langsung mengubah statistik, jumlah di tab, dan badge sidebar.
 export function PesananWorkspace() {
-  const { pesanan } = useDashboardData();
+  const { pesanan, statusPesanan, galatPesanan, muatPesanan } = useDashboardData();
   const { open } = useDetail();
 
   const [tab, setTab] = useState(TAB_AWAL);
@@ -87,6 +87,17 @@ export function PesananWorkspace() {
         }
       />
 
+      {statusPesanan === "gagal" && (
+        <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-warn-400/40 bg-[#FFF6DB] px-4 py-3 text-sm text-[#7A4B00]">
+          <p>
+            <span className="font-semibold">Data pesanan belum tersambung ke server.</span> Yang tampil adalah data contoh{galatPesanan ? ` (${galatPesanan})` : ""}. Perubahan status tidak bisa disimpan sementara.
+          </p>
+          <Button variant="secondary" size="sm" onClick={() => void muatPesanan()}>
+            Coba lagi
+          </Button>
+        </div>
+      )}
+
       <StatCardGrid stats={stats} columns={3} />
 
       <Card className="overflow-hidden p-0">
@@ -142,6 +153,7 @@ export function PesananWorkspace() {
                     <td className="whitespace-nowrap px-3 py-4 font-bold text-ink-900">{formatRupiah(p.total)}</td>
                     <td className="px-3 py-4">
                       <StatusBadge status={p.status} />
+                      {p.status === "dibatalkan" && p.dibatalkanOleh && <p className="mt-1 text-xs text-ink-500">oleh {p.dibatalkanOleh}</p>}
                     </td>
                     <td className="px-6 py-4">
                       <button type="button" onClick={() => open({ type: "pesanan", id: p.id })} className="text-sm font-bold text-brand-600 hover:underline">

@@ -1,39 +1,85 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ambilPesanan, simpanPesanan } from "@/lib/actions/pesanan";
 import { KURIR_DEFAULT, PESANAN_LIST } from "@/lib/data/pesanan";
+import { pesananDariApi, perubahanKeApi } from "@/lib/pesananApi";
 import { butuhKurir, terapkanStatus } from "@/lib/pesanan";
 import type { Pesanan, StatusPesanan } from "@/types";
 
-// State pesanan. `cariPesanan` membaca nilai terbaru lewat ref, sehingga aksi
-// lintas-domain (mis. mencatat penjualan ke kas) tidak perlu efek samping di
-// dalam updater setState (updater harus murni; di dev React menjalankannya dua kali).
+export type StatusMuatPesanan = "memuat" | "siap" | "gagal";
+
+// State pesanan, disimpan di Express API (/admin/orders) lewat server action. Aksi bersifat async dan
+// MELEMPAR Error berisi pesan dari server bila ditolak (mis. loncat status), supaya pemanggil bisa menampilkannya.
+// Bila server tidak bisa dihubungi, data contoh ditampilkan dan `statusPesanan` = "gagal".
+// `cariPesanan` membaca nilai terbaru lewat ref (aksi lintas-domain tidak perlu efek samping di updater setState).
 export function usePesananState() {
-  const [pesanan, setPesanan] = useState<Pesanan[]>(PESANAN_LIST);
+  const [pesanan, setPesanan] = useState<Pesanan[]>([]);
+  const [statusPesanan, setStatus] = useState<StatusMuatPesanan>("memuat");
+  const [galatPesanan, setGalat] = useState<string | null>(null);
   const ref = useRef(pesanan);
   useEffect(() => {
     ref.current = pesanan;
   }, [pesanan]);
 
+  const muatPesanan = useCallback(async () => {
+    setStatus("memuat");
+    const hasil = await ambilPesanan();
+    if (hasil.ok) {
+      setPesanan(hasil.data.map(pesananDariApi));
+      setGalat(null);
+      setStatus("siap");
+      return;
+    }
+    setPesanan(PESANAN_LIST);
+    setGalat(hasil.message);
+    setStatus("gagal");
+  }, []);
+
+  useEffect(() => {
+    void muatPesanan();
+  }, [muatPesanan]);
+
   const cariPesanan = useCallback((id: string) => ref.current.find((p) => p.id === id), []);
 
-  // Kurir ditugaskan BUMDes (otomatis per RW), bukan penjual. Di data dummy ini disimulasikan:
-  // pesanan kurir-desa yang paketnya sudah siap otomatis mendapat kurir bawaan.
-  const ubahStatus = useCallback((id: string, status: StatusPesanan) => {
-    const sekarang = new Date();
-    setPesanan((daftar) =>
-      daftar.map((p) => {
-        if (p.id !== id) return p;
-        const diperbarui = terapkanStatus(p, status, sekarang);
-        return { ...diperbarui, kurir: p.kurir ?? (butuhKurir(p, status) ? KURIR_DEFAULT : undefined) };
-      }),
-    );
-  }, []);
+  // Kirim hasil perubahan ke server, lalu ganti item dengan baris dari server (sumber kebenaran).
+  const simpanPerubahan = useCallback(
+    async (id: string, baru: Pesanan) => {
+      if (statusPesanan === "gagal") throw new Error("Server tidak dapat dihubungi. Perubahan belum bisa disimpan.");
+      const hasil = await simpanPesanan(id, perubahanKeApi(baru));
+      if (!hasil.ok) throw new Error(hasil.message);
+      const tersimpan = pesananDariApi(hasil.data);
+      setPesanan((daftar) => daftar.map((p) => (p.id === id ? tersimpan : p)));
+    },
+    [statusPesanan],
+  );
+
+  // Kurir ditugaskan BUMDes (otomatis per RW), bukan penjual. Di sini disimulasikan: pesanan kurir-desa
+  // yang paketnya sudah siap otomatis mendapat kurir bawaan.
+  const ubahStatus = useCallback(
+    async (id: string, status: StatusPesanan) => {
+      const lama = ref.current.find((p) => p.id === id);
+      if (!lama) throw new Error("Pesanan tidak ditemukan.");
+      const diperbarui = terapkanStatus(lama, status, new Date());
+      await simpanPerubahan(id, { ...diperbarui, kurir: lama.kurir ?? (butuhKurir(lama, status) ? KURIR_DEFAULT : undefined) });
+    },
+    [simpanPerubahan],
+  );
 
   // Perubahan bebas atas satu pesanan (mis. komplain); aturan perubahannya ada di lib/*.
-  const perbarui = useCallback((id: string, ubah: (p: Pesanan) => Pesanan) => {
-    setPesanan((daftar) => daftar.map((p) => (p.id === id ? ubah(p) : p)));
-  }, []);
+  const perbarui = useCallback(
+    async (id: string, ubah: (p: Pesanan) => Pesanan) => {
+      const lama = ref.current.find((p) => p.id === id);
+      if (!lama) throw new Error("Pesanan tidak ditemukan.");
+      const baru = ubah(lama);
+      if (baru === lama) return;
+      await simpanPerubahan(id, baru);
+    },
+    [simpanPerubahan],
+  );
 
-  return useMemo(() => ({ pesanan, cariPesanan, ubahStatus, perbarui }), [pesanan, cariPesanan, ubahStatus, perbarui]);
+  return useMemo(
+    () => ({ pesanan, statusPesanan, galatPesanan, muatPesanan, cariPesanan, ubahStatus, perbarui }),
+    [pesanan, statusPesanan, galatPesanan, muatPesanan, cariPesanan, ubahStatus, perbarui],
+  );
 }

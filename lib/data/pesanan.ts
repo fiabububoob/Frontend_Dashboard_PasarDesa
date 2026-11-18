@@ -14,7 +14,8 @@ export const PESANAN_TABS: TabPesanan[] = [
   { label: "Dalam Antaran", status: ["siap-jemput", "diantar", "tiba-di-pos"] },
   { label: "Komplain", status: ["komplain"] },
   { label: "Selesai", status: ["selesai"] },
-  { label: "Belum Bayar & Batal", status: ["menunggu-pembayaran", "dibatalkan"] },
+  { label: "Belum Dibayar", status: ["menunggu-pembayaran"] },
+  { label: "Dibatalkan", status: ["dibatalkan"] },
 ];
 
 export const KURIR_DEFAULT: KurirPesanan = {

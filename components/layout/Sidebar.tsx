@@ -11,10 +11,9 @@ import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { useStatusLapak } from "@/components/providers/useStatusLapak";
 import { hitungStatus } from "@/lib/pesanan";
 
-const ITEM_BASE = "group flex w-full items-center gap-3 rounded-lg border-l-[3px] border-transparent px-3 py-2.5 text-sm transition-colors duration-feedback ease-enter";
+const ITEM_BASE = "flex w-full items-center gap-3 rounded-lg border-l-[3px] border-transparent px-3 py-2.5 text-sm transition-colors duration-feedback ease-enter";
 const ITEM_IDLE = "font-medium text-ink-700 hover:bg-surface-muted hover:text-ink-900";
 const ITEM_ACTIVE = "border-brand-600 bg-brand-50 font-semibold text-brand-900";
-const ICON_CLASS = "h-[18px] w-[18px] shrink-0 transition-colors duration-feedback ease-enter";
 
 function GroupLabel({ children }: { children: string }) {
   return <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-ink-500">{children}</p>;
@@ -26,8 +25,9 @@ function GroupLabel({ children }: { children: string }) {
 export function Sidebar() {
   const pathname = usePathname();
   const { open } = useDetail();
-  const { pesanan, pengaturan } = useDashboardData();
+  const { pesanan, aduan, pengaturan } = useDashboardData();
   const perluDikemas = hitungStatus(pesanan, "perlu-dikemas");
+  const komplainBaru = pesanan.filter((p) => p.komplain?.status === "diajukan").length + aduan.filter((a) => a.status === "diverifikasi").length;
 
   const { status: lapak } = useStatusLapak(pengaturan);
 
@@ -36,9 +36,10 @@ export function Sidebar() {
   const keterangan = !lapak ? "" : lapak.buka ? `Menerima pesanan · ${lapak.keterangan}` : lapak.keterangan;
 
   return (
-<aside className="hidden w-[230px] shrink-0 flex-col border-r border-line bg-surface px-3.5 pb-5 pt-5 lg:flex">
-  <div className="flex items-center gap-2.5 px-1.5 pb-7">
-    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100 text-brand-600">          <Sprout className="h-5 w-5" />
+    <aside className="hidden w-[230px] shrink-0 flex-col border-r border-line bg-surface px-3.5 pb-5 pt-5 lg:flex">
+      <div className="flex items-center gap-2.5 px-1.5 pb-7">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100 text-brand-600">
+          <Sprout className="h-5 w-5" />
         </div>
         <div>
           <p className="font-display text-base font-semibold leading-tight text-ink-900">PasarDesa</p>
@@ -46,22 +47,23 @@ export function Sidebar() {
         </div>
       </div>
 
-      <nav aria-label="Menu" className="flex-1 overflow-y-auto">        <GroupLabel>Menu</GroupLabel>
+      <nav aria-label="Menu" className="flex-1 overflow-y-auto">
+        <GroupLabel>Menu</GroupLabel>
         <ul className="space-y-1">
           {NAV_ITEMS.map((item) => {
             const active = pathname === item.href;
             const Icon = item.icon;
             // Badge pesanan dihitung dari data hidup, bukan teks tetap.
-            const badge = item.href === "/pesanan" && perluDikemas > 0 ? perluDikemas : undefined;
+            const badge = item.href === "/pesanan" && perluDikemas > 0 ? perluDikemas : item.href === "/pengaduan" && komplainBaru > 0 ? komplainBaru : undefined;
             return (
               <li key={item.href}>
                 <Link href={item.href} aria-current={active ? "page" : undefined} className={clsx(ITEM_BASE, "justify-between", active ? ITEM_ACTIVE : ITEM_IDLE)}>
                   <span className="flex min-w-0 items-center gap-3">
-                    <Icon className={clsx(ICON_CLASS, active ? "text-brand-600" : "text-ink-400 group-hover:text-brand-600")} />
+                    <Icon className={clsx("h-[18px] w-[18px] shrink-0", active ? "text-brand-600" : "text-ink-400")} />
                     <span className="truncate">{item.label}</span>
                   </span>
                   {badge !== undefined && (
-                    <span aria-label={`${badge} pesanan baru`} className="shrink-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#B8420F] px-1.5 text-[11px] font-semibold text-white">
+                    <span aria-label={item.href === "/pengaduan" ? `${badge} pengaduan baru` : `${badge} pesanan baru`} className="shrink-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#B8420F] px-1.5 text-[11px] font-semibold text-white">
                       {badge}
                     </span>
                   )}
@@ -76,13 +78,13 @@ export function Sidebar() {
           <ul className="space-y-1">
             <li>
               <button type="button" onClick={() => open({ type: "hotline" })} className={clsx(ITEM_BASE, ITEM_IDLE)}>
-                <Headset className={clsx(ICON_CLASS, "text-ink-400 group-hover:text-brand-600")} />
+                <Headset className="h-[18px] w-[18px] shrink-0 text-ink-400" />
                 Hubungi CS
               </button>
             </li>
             <li>
               <button type="button" onClick={() => open({ type: "warta", id: WARTA_LIST[0].id })} className={clsx(ITEM_BASE, ITEM_IDLE)}>
-                <Megaphone className={clsx(ICON_CLASS, "text-ink-400 group-hover:text-brand-600")} />
+                <Megaphone className="h-[18px] w-[18px] shrink-0 text-ink-400" />
                 Pengumuman
               </button>
             </li>

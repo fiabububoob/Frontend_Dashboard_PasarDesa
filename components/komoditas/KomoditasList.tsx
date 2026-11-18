@@ -7,7 +7,7 @@ import { FotoProduk } from "@/components/ui/FotoProduk";
 import { useDetail } from "@/components/detail/DetailProvider";
 import { stagger } from "@/lib/motion";
 import { formatRupiah } from "@/lib/format";
-import { indukNama, inisialProduk, ketersediaanDari, LABEL_STATUS_TAMPILAN, labelBadge, penjualDari, statusTampilan, sumberDari, type StatusTampilan } from "@/lib/komoditas";
+import { indukNama, inisialProduk, ketersediaanDari, LABEL_STATUS_TAMPILAN, labelBadge, statusTampilan, sumberDari, type StatusTampilan } from "@/lib/komoditas";
 import { BARIS_AKSI, WARNA_TILE } from "./tampilan";
 import { MenuAksiKomoditas } from "./MenuAksiKomoditas";
 import { Pencil } from "lucide-react";
@@ -67,7 +67,7 @@ export function KomoditasList({ data, terpilih, onPilih, onPilihSemua, emptyTitl
             <th className="px-2 py-3">Foto</th>
             <th className="px-3 py-3">Nama Komoditas</th>
             <th className="px-3 py-3">Kategori</th>
-            <th className="px-3 py-3">Penjual</th>
+            <th className="px-3 py-3">Asal</th>
             <th className="px-3 py-3">Harga</th>
             <th className="px-3 py-3">Stok</th>
             <th className="px-3 py-3">Terjual</th>
@@ -97,7 +97,7 @@ export function KomoditasList({ data, terpilih, onPilih, onPilihSemua, emptyTitl
                 <p className="text-xs text-ink-500">{k.kategori}</p>
               </td>
               <td className="max-w-[160px] px-3 py-4 text-ink-900">
-                <p>{penjualDari(k)}</p>
+                <p>{k.asalBlok}</p>
                 <p className="text-xs text-ink-500">{sumberDari(k)}</p>
               </td>
               <td className="whitespace-nowrap px-3 py-4">

@@ -89,7 +89,7 @@ export function waktuPanenLabel(k: Pick<Komoditas, "tanggalPanen" | "waktuPanen"
 export const labelBadge = (kode: BadgeProduk): string => BADGE_PRODUK.find((b) => b.kode === kode)?.label ?? kode;
 
 // ---------------------------------------------------------------------------
-// Tampilan daftar komoditas (tab status, kolom penjual/ketersediaan)
+// Tampilan daftar komoditas (tab status, kolom asal/ketersediaan)
 // ---------------------------------------------------------------------------
 export type StatusTampilan = "aktif" | "stok-rendah" | "nonaktif";
 
@@ -114,8 +114,6 @@ const SUMBER_PER_INDUK: Record<string, SumberKomoditas> = {
 
 export const sumberDari = (k: Pick<Komoditas, "sumber" | "kategori">): SumberKomoditas =>
   k.sumber ?? SUMBER_PER_INDUK[indukDari(k.kategori)?.nama ?? ""] ?? "Petani";
-
-export const penjualDari = (k: Pick<Komoditas, "penjual" | "asalBlok">): string => k.penjual ?? k.asalBlok;
 
 export const ketersediaanDari = (k: Pick<Komoditas, "ketersediaan">): string => k.ketersediaan ?? "Siap kirim";
 

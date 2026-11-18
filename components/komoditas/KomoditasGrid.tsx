@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { useDetail } from "@/components/detail/DetailProvider";
 import { stagger } from "@/lib/motion";
 import { formatRupiah } from "@/lib/format";
-import { indukNama, inisialProduk, penjualDari, statusTampilan, sumberDari } from "@/lib/komoditas";
+import { indukNama, inisialProduk, statusTampilan, sumberDari } from "@/lib/komoditas";
 import { LabelProduk, StatusPill } from "./KomoditasList";
 import { MenuAksiKomoditas } from "./MenuAksiKomoditas";
 import { WARNA_TILE } from "./tampilan";
@@ -57,7 +57,7 @@ export function KomoditasGrid({ data, emptyTitle = "Belum ada komoditas", emptyD
                 <span>Terjual: {k.terjual ?? 0}</span>
               </p>
               <p className="border-t border-line pt-2 text-xs text-ink-500">
-                {penjualDari(k)} · {sumberDari(k)}
+                {k.asalBlok} · {sumberDari(k)}
               </p>
             </div>
           </article>

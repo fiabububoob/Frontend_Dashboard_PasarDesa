@@ -4,6 +4,8 @@ import {
   Truck,
   Wallet,
   Store,
+  Flag,
+  Star,
   type LucideIcon,
 } from "lucide-react";
 
@@ -25,6 +27,8 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard },
   { label: "Komoditas", href: "/komoditas", icon: Warehouse },
   { label: "Pesanan", href: "/pesanan", icon: Truck },
+  { label: "Pengaduan", href: "/pengaduan", icon: Flag },
+  { label: "Ulasan", href: "/ulasan", icon: Star },
   { label: "Kas & Saldo", href: "/kas", icon: Wallet },
   { label: "Pengaturan", href: "/pengaturan", icon: Store },
 ];

@@ -6,7 +6,7 @@ export interface Spesifikasi {
   nilai: string;
 }
 
-// Siapa yang menjual/menghasilkan komoditas (kolom "Penjual" & pilihan "Jenis sumber").
+// Asal komoditas (pilihan "Jenis sumber"). Penjualnya selalu BUMDes, jadi tidak ada isian nama penjual.
 export type SumberKomoditas = "Petani" | "UMKM" | "BUMDes";
 
 // Pengaturan pengiriman & kebijakan klaim per komoditas (langkah 5 form).
@@ -58,8 +58,6 @@ export interface Komoditas {
   tampil: boolean;
   tag?: string;
   sumber?: SumberKomoditas;
-  /** Nama penjual (kelompok tani / UMKM / BUMDes). Bila kosong, dipakai `asalBlok`. */
-  penjual?: string;
   /** Jumlah unit yang sudah terjual. */
   terjual?: number;
   /** Mis. "Siap kirim", "Panen pagi". */
@@ -76,7 +74,7 @@ export interface Komoditas {
 // Data minimal untuk membuat komoditas baru (form tambah & impor CSV).
 // id, sku, status stok, dan keterangan panen dibuat oleh state komoditas.
 export type KomoditasBaru = Pick<Komoditas, "nama" | "gambar" | "kategori" | "asalBlok" | "harga" | "satuan" | "stok" | "stokMaks"> &
-  Partial<Pick<Komoditas, "sumber" | "penjual" | "ketersediaan" | "batasStokRendah" | "minBeli" | "maksBeli" | "keunggulan" | "garansiMutu" | "pengiriman" | "foto" | "tag" | "hargaKeterangan" | "tampil" | "hargaCoret" | "ukuran" | "deskripsi" | "spesifikasi" | "saranPenyimpanan" | "tanggalPanen" | "badge">>;
+  Partial<Pick<Komoditas, "sumber" | "ketersediaan" | "batasStokRendah" | "minBeli" | "maksBeli" | "keunggulan" | "garansiMutu" | "pengiriman" | "foto" | "tag" | "hargaKeterangan" | "tampil" | "hargaCoret" | "ukuran" | "deskripsi" | "spesifikasi" | "saranPenyimpanan" | "tanggalPanen" | "badge">>;
 
 export type KomoditasUbah = Partial<
   Pick<
@@ -100,7 +98,6 @@ export type KomoditasUbah = Partial<
     | "tanggalPanen"
     | "badge"
     | "sumber"
-    | "penjual"
     | "ketersediaan"
     | "batasStokRendah"
     | "minBeli"

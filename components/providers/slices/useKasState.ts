@@ -1,61 +1,59 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { ajukanPenarikan, ambilDataKas } from "@/lib/actions/kas";
+import { mutasiDariApi } from "@/lib/kasApi";
 import { KAS_OMSET_AWAL, KAS_REKENING, KAS_SALDO_AWAL, KAS_TRANSAKSI } from "@/lib/data/kas";
-import { TANGGAL_DATA_DUMMY } from "@/lib/constants";
-import { waktuWib } from "@/lib/format";
-import { formatIdTransaksi, transaksiPencairan, transaksiPenjualan, type DraftTransaksi } from "@/lib/kas";
-import { nilaiBersih } from "@/lib/komplain";
-import type { JalurPencairan, Pesanan, Rekening, TransaksiKas } from "@/types";
+import type { JalurPencairan, Rekening, TransaksiKas } from "@/types";
 
-const NOMOR_REFERENSI_AWAL = 8812;
+export type StatusMuatKas = "memuat" | "siap" | "gagal";
 
 // State kas: saldo, omset, rekening, dan riwayat mutasi.
+// Saldo, omset, dan mutasi diambil dari Express API (/cash/summary + /cash). Bila server tidak bisa
+// dihubungi, data contoh ditampilkan dan `statusKas` = "gagal" supaya UI bisa memberi tahu pengguna.
 export function useKasState() {
-  const [transaksi, setTransaksi] = useState<TransaksiKas[]>(KAS_TRANSAKSI);
-  const [saldoAktif, setSaldoAktif] = useState(KAS_SALDO_AWAL);
-  const [omset, setOmset] = useState(KAS_OMSET_AWAL);
+  const [transaksi, setTransaksi] = useState<TransaksiKas[]>([]);
+  const [saldoAktif, setSaldoAktif] = useState(0);
+  const [omset, setOmset] = useState(0);
+  const [statusKas, setStatusKas] = useState<StatusMuatKas>("memuat");
+  const [galatKas, setGalatKas] = useState<string | null>(null);
   const [rekening, setRekening] = useState<Rekening>(KAS_REKENING);
 
-  // Ref: aksi membaca saldo terbaru tanpa efek samping di dalam updater setState.
-  const saldoRef = useRef(saldoAktif);
-  const urutan = useRef(KAS_TRANSAKSI.length);
-  const sudahDibukukan = useRef(new Set<string>()); // pesanan yang penjualannya sudah tercatat
-  useEffect(() => {
-    saldoRef.current = saldoAktif;
-  }, [saldoAktif]);
 
-  const catat = useCallback((draft: DraftTransaksi) => {
-    urutan.current += 1;
-    const baru: TransaksiKas = { ...draft, id: formatIdTransaksi(urutan.current), tanggal: TANGGAL_DATA_DUMMY, waktu: waktuWib() };
-    setTransaksi((daftar) => [baru, ...daftar]);
+  const muatKas = useCallback(async () => {
+    setStatusKas("memuat");
+    const hasil = await ambilDataKas();
+    if (hasil.ok) {
+      const { ringkasan, mutasi } = hasil.data;
+      setSaldoAktif(ringkasan.saldoAktif);
+      setOmset(ringkasan.omsetBulanIni);
+      setTransaksi(mutasi.map(mutasiDariApi));
+      setGalatKas(null);
+      setStatusKas("siap");
+      return;
+    }
+    // Server tidak tersedia: tampilkan data contoh agar halaman tetap bisa dipakai, dan beri tahu pengguna.
+    setTransaksi(KAS_TRANSAKSI);
+    setSaldoAktif(KAS_SALDO_AWAL);
+    setOmset(KAS_OMSET_AWAL);
+    setGalatKas(hasil.message);
+    setStatusKas("gagal");
   }, []);
 
-  // Pesanan selesai → escrow lepas: saldo aktif & omset naik sebesar NILAI BERSIH (setelah refund
-  // komplain), penjualan tercatat (sekali per pesanan). Bila seluruhnya di-refund, tidak ada yang dicatat.
-  const catatPenjualan = useCallback(
-    (p: Pesanan) => {
-      if (sudahDibukukan.current.has(p.id)) return;
-      sudahDibukukan.current.add(p.id);
-      const bersih = nilaiBersih(p);
-      if (bersih <= 0) return;
-      setSaldoAktif((s) => s + bersih);
-      setOmset((o) => o + bersih);
-      catat(transaksiPenjualan(p));
-    },
-    [catat],
-  );
+  useEffect(() => {
+    void muatKas();
+  }, [muatKas]);
 
-  // Mengembalikan false bila nominal tidak valid atau melebihi saldo (mis. saldo berubah saat dialog konfirmasi terbuka).
+  // Penarikan diproses server (saldo dicek di sana, dengan kunci agar dua penarikan bersamaan tidak lolos
+  // bersamaan). Melempar Error berisi pesan dari server bila ditolak; sukses → data kas dimuat ulang.
   const ajukanPencairan = useCallback(
-    (nominal: number, jalur: JalurPencairan) => {
-      if (nominal <= 0 || nominal > saldoRef.current) return false;
-      saldoRef.current -= nominal;
-      setSaldoAktif((s) => s - nominal);
-      catat(transaksiPencairan(nominal, jalur, rekening, NOMOR_REFERENSI_AWAL + urutan.current));
-      return true;
+    async (nominal: number, jalur: JalurPencairan) => {
+      if (statusKas === "gagal") throw new Error("Server tidak dapat dihubungi. Penarikan belum bisa diproses.");
+      const hasil = await ajukanPenarikan(nominal, jalur);
+      if (!hasil.ok) throw new Error(hasil.message);
+      await muatKas();
     },
-    [catat, rekening],
+    [statusKas, muatKas],
   );
 
   // Rekening yang diubah harus diverifikasi ulang oleh BUMDes.
@@ -64,7 +62,7 @@ export function useKasState() {
   }, []);
 
   return useMemo(
-    () => ({ transaksi, saldoAktif, omset, rekening, catatPenjualan, ajukanPencairan, ubahRekening }),
-    [transaksi, saldoAktif, omset, rekening, catatPenjualan, ajukanPencairan, ubahRekening],
+    () => ({ transaksi, saldoAktif, omset, rekening, statusKas, galatKas, muatKas, ajukanPencairan, ubahRekening }),
+    [transaksi, saldoAktif, omset, rekening, statusKas, galatKas, muatKas, ajukanPencairan, ubahRekening],
   );
 }

@@ -5,6 +5,7 @@ export type StatusMutasi =
   | "Berhasil Disubsidi"
   | "Berhasil Ditransfer"
   | "Berhasil Dicairkan"
+  | "Dikoreksi"
   | "Diproses"
   | "Menunggu Pengambilan";
 
