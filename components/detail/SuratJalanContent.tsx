@@ -69,8 +69,7 @@ export function SuratJalanContent() {
                       <span className="text-ink-500">{p.pembeli}</span>
                     </td>
                     <td className="py-1.5 pr-2 text-ink-700">{p.items.map((i) => i.komoditas).join(", ")}</td>
-                    <td className="py-1.5 text-right text-ink-900">{p.metodeBayar === "QRIS" ? "Lunas" : formatRupiah(p.total)}</td>
-                    <td className="py-1.5 text-center">
+                        {p.metodeBayar === "COD" ? formatRupiah(p.total) : "Lunas"}                    <td className="py-1.5 text-center">
                       <span className="inline-block h-4 w-4 rounded border border-ink-400" />
                     </td>
                   </tr>

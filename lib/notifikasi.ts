@@ -3,7 +3,7 @@ import { JAM_JEMPUT_SORE } from "./constants";
 import { KURIR_AKTIF, WARTA_LIST } from "./data/ringkasan";
 import { hitungStatus } from "./pesanan";
 
-export type JenisNotifikasi = "dikemas" | "stok-kritis" | "kurir" | "pengumuman";
+export type JenisNotifikasi = "komplain" | "dikemas" | "stok-kritis" | "kurir" | "pengumuman";
 
 export interface Notifikasi {
   key: string;
@@ -18,6 +18,17 @@ export interface Notifikasi {
 // saat stok atau status pesanan berubah. Fungsi murni → mudah diuji.
 export function buatNotifikasi(data: { pesanan: Pesanan[]; komoditas: Komoditas[] }): Notifikasi[] {
   const hasil: Notifikasi[] = [];
+
+  const komplain = data.pesanan.filter((p) => p.komplain?.status === "diajukan");
+  if (komplain.length > 0) {
+    hasil.push({
+      key: "komplain",
+      jenis: "komplain",
+      judul: `${komplain.length} komplain perlu ditangani`,
+      keterangan: "Dana pesanan ditahan sampai komplain selesai",
+      target: { type: "pesanan", id: komplain[0].id },
+    });
+  }
 
   const perluDikemas = data.pesanan.filter((p) => p.status === "perlu-dikemas");
   if (perluDikemas.length > 0) {

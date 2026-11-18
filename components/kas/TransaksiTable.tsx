@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Download, Inbox, Search, SearchX, X } from "lucide-react";
+import { Download, Inbox, SearchX, X } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -27,7 +27,7 @@ const KATEGORI_TONE: Record<TransaksiKas["kategori"], "success" | "warning" | "i
   "Subsidi Desa": "info",
 };
 
-const SEMUA = "Semua Mutasi";
+const SEMUA = "Semua";
 
 export function TransaksiTable() {
   const { transaksi } = useDashboardData();
@@ -57,19 +57,19 @@ export function TransaksiTable() {
   // CSV (pemisah koma, BOM UTF-8) langsung terbuka di Excel. Mengekspor hasil
   // yang sedang difilter, bukan hanya halaman yang tampil.
   function unduhExcel() {
-    downloadCsv("riwayat-kas-oktober-2023.csv", [
+    downloadCsv("riwayat-kas-oktober-2026.csv", [
       ["ID", "Tanggal", "Waktu", "Deskripsi", "Referensi", "Kategori", "Nominal", "Status"],
       ...hasil.map((t) => [t.id, t.tanggal, t.waktu, t.deskripsi, t.referensi, t.kategori, t.nominal, t.status]),
     ]);
-    toast({ type: "success", title: "Riwayat kas diunduh", description: `${hasil.length} mutasi → riwayat-kas-oktober-2023.csv (bisa dibuka di Excel)` });
+    toast({ type: "success", title: "Riwayat kas diunduh", description: `${hasil.length} mutasi → riwayat-kas-oktober-2026.csv (bisa dibuka di Excel)` });
   }
 
   return (
     <Card className="overflow-hidden p-0">
-      <div className="flex flex-col justify-between gap-3 p-5 sm:flex-row sm:items-center">
+      <div className="flex flex-col justify-between gap-3 px-6 pb-4 pt-6 sm:flex-row sm:items-center">
         <div>
-          <p className="text-xs font-medium uppercase text-ink-400">Buku Kas Poktan</p>
-          <h3 className="mt-0.5 font-display text-lg font-bold text-ink-900">Riwayat Mutasi &amp; Transaksi Keuangan</h3>
+          <p className="text-sm font-semibold text-brand-600">Buku kas</p>
+          <h3 className="font-display text-xl font-bold text-ink-900">Riwayat Mutasi &amp; Transaksi</h3>
         </div>
         <Button variant="secondary" size="sm" onClick={unduhExcel} disabled={hasil.length === 0}>
           <Download className="h-3.5 w-3.5" />
@@ -77,17 +77,16 @@ export function TransaksiTable() {
         </Button>
       </div>
 
-      <div className="space-y-3 px-5 pb-4">
+      <div className="space-y-4 px-6 pb-5">
         <FilterPills options={filterOptions} active={kategori} onChange={setKategori} />
-        <div className="relative sm:max-w-sm">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" aria-hidden />
-          <input
+        <div className="relative">
+                    <input
             type="search"
             aria-label="Cari transaksi"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Cari deskripsi, invoice, atau tanggal…"
-            className="w-full rounded-lg border border-line bg-white py-2 pl-9 pr-8 text-sm text-ink-700 placeholder:text-ink-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 [&::-webkit-search-cancel-button]:hidden"
+            className="w-full rounded-xl border border-line bg-white py-3 pl-4 pr-8 text-sm text-ink-700 placeholder:text-ink-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 [&::-webkit-search-cancel-button]:hidden"
           />
           {query && (
             <button type="button" aria-label="Hapus pencarian" onClick={() => setQuery("")} className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-ink-400 hover:text-ink-700">
@@ -121,36 +120,36 @@ export function TransaksiTable() {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px] text-left text-sm">
             <thead>
-              <tr className="border-y border-line bg-surface-muted text-xs uppercase text-ink-400">
-                <th className="px-5 py-3 font-medium">Tanggal &amp; Waktu</th>
-                <th className="px-3 py-3 font-medium">Deskripsi Transaksi &amp; Referensi</th>
-                <th className="px-3 py-3 font-medium">Kategori Mutasi</th>
-                <th className="px-3 py-3 text-right font-medium">Nominal</th>
-                <th className="px-5 py-3 text-right font-medium">Status</th>
+              <tr className="border-y border-line bg-surface-muted text-[11px] font-semibold uppercase tracking-wider text-ink-500">
+                <th className="px-5 py-3">Tanggal</th>
+                <th className="px-3 py-3">Deskripsi &amp; Referensi</th>
+                <th className="px-3 py-3">Kategori</th>
+                <th className="px-3 py-3">Nominal</th>
+                <th className="px-5 py-3">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
               {tampil.map((trx, index) => (
                 <tr key={trx.id} className="animate-fade-in" style={stagger(index)}>
                   <td className="px-5 py-4 text-ink-700">
-                    <p className="font-medium text-ink-900">{trx.tanggal}</p>
-                    <p className="text-xs text-ink-400">{trx.waktu}</p>
+                    <p className="font-bold text-ink-900">{trx.tanggal}</p>
+                    <p className="text-xs text-ink-500">{trx.waktu}</p>
                   </td>
                   <td className="px-3 py-4">
                     <button type="button" onClick={() => open({ type: "transaksi", id: trx.id })} className="text-left">
-                      <span className="block font-medium text-ink-900 hover:text-brand-700 hover:underline">{trx.deskripsi}</span>
-                      <span className="block text-xs text-ink-400">{trx.referensi}</span>
+                      <span className="block font-bold text-ink-900 hover:text-brand-700">{trx.deskripsi}</span>
+                      <span className="block text-xs text-ink-500">{trx.referensi}</span>
                     </button>
                   </td>
                   <td className="px-3 py-4">
                     <Badge tone={KATEGORI_TONE[trx.kategori]}>{trx.kategori}</Badge>
                   </td>
-                  <td className={`px-3 py-4 text-right font-semibold ${trx.nominal < 0 ? "text-danger-600" : "text-brand-600"}`}>
+                  <td className={`whitespace-nowrap px-3 py-4 font-bold ${trx.nominal < 0 ? "text-rupiah" : "text-brand-700"}`}>
                     {trx.nominal < 0 ? "-" : "+"}
                     {formatRupiah(Math.abs(trx.nominal))}
                   </td>
-                  <td className="px-5 py-4 text-right">
-                    <Badge tone={mutasiBelumFinal(trx.status) ? "warning" : "success"}>{trx.status}</Badge>
+                  <td className="px-5 py-4">
+                    <Badge tone={mutasiBelumFinal(trx.status) ? "warning" : /Ditransfer|Dicairkan/.test(trx.status) ? "neutral" : "success"}>{trx.status}</Badge>
                   </td>
                 </tr>
               ))}

@@ -6,8 +6,9 @@ import type { Komoditas } from "@/types";
 export const AMBANG_KRITIS = 5;
 const RASIO_MENENGAH = 0.4;
 
-export function hitungStatusStok(stok: number, stokMaks: number): Komoditas["statusStok"] {
-  if (stok < AMBANG_KRITIS) return "kritis";
+export function hitungStatusStok(stok: number, stokMaks: number, batasStokRendah?: number): Komoditas["statusStok"] {
+  // Batas buatan penjual (form komoditas) menggantikan ambang bawaan.
+  if (batasStokRendah !== undefined ? stok <= batasStokRendah : stok < AMBANG_KRITIS) return "kritis";
   if (stok / stokMaks <= RASIO_MENENGAH) return "menengah";
   return "aman";
 }

@@ -4,8 +4,7 @@ import { useEffect, type RefObject } from "react";
 
 // Memanggil `onOutside` saat pengguna menekan mouse di luar elemen `ref`.
 // Dipakai dropdown/popup (menu profil, notifikasi, pencarian, filter batch).
-export function useClickOutside(ref: RefObject<HTMLElement>, onOutside: () => void, aktif = true) {
-  useEffect(() => {
+export function useClickOutside(ref: RefObject<HTMLElement | null>, onOutside: () => void, aktif = true) {  useEffect(() => {
     if (!aktif) return;
     const handler = (e: MouseEvent) => {
       if (!ref.current?.contains(e.target as Node)) onOutside();

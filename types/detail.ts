@@ -26,6 +26,7 @@ export type DetailTarget =
   | { type: "surat-jalan" }
   | { type: "transaksi"; id: string }
   | { type: "rekening" }
+  | { type: "tarik-saldo" }
   | { type: "laporan-kas" }
   | { type: "pratinjau-warga"; data?: PengaturanLapak } // data = draft belum tersimpan (opsional)
   | { type: "piagam" }

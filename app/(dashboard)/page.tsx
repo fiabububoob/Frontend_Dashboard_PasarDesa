@@ -4,6 +4,7 @@ import { TrenPanenChart } from "@/components/dashboard/TrenPanenChart";
 import { AntreanPesananTable } from "@/components/dashboard/AntreanPesananTable";
 import { KategoriCard } from "@/components/dashboard/KategoriCard";
 import { LogistikKurirCard, StokKritisCard, WartaCard } from "@/components/dashboard/SidePanels";
+import { PengaduanTerbaruCard, UlasanTerbaruCard } from "@/components/dashboard/PengaduanUlasanCards";
 
 // Halaman ini hanya menyusun komponen. Semua tombol di Ringkasan membuka modal
 // lewat useDetail() (lihat components/detail/DetailProvider.tsx), dan datanya
@@ -23,6 +24,8 @@ export default function RingkasanPage() {
         <div className="space-y-6">
           <LogistikKurirCard />
           <StokKritisCard />
+          <PengaduanTerbaruCard />
+          <UlasanTerbaruCard />
           <KategoriCard />
           <WartaCard />
         </div>

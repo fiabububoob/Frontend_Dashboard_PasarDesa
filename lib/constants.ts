@@ -2,9 +2,9 @@
 // didefinisikan di sini supaya tidak ada "magic value" yang tersebar.
 
 /** "Hari ini" pada data dummy (data awal ditulis untuk tanggal ini). */
-export const TANGGAL_DATA_DUMMY = "24 Okt 2023";
+export const TANGGAL_DATA_DUMMY = "24 Okt 2026";
 export const BULAN_LAPORAN = "Oktober";
-export const PERIODE_LAPORAN = `${BULAN_LAPORAN} 2023`;
+export const PERIODE_LAPORAN = `${BULAN_LAPORAN} 2026`;
 
 /** Jumlah baris per halaman pada tabel yang berpaginasi. */
 export const UKURAN_HALAMAN = 5;
@@ -34,6 +34,12 @@ export const MAKS_SARAN_PENYIMPANAN = 200;
 
 /** Kloter jemput kurir desa sore hari. */
 export const JAM_JEMPUT_SORE = "15:00 WIB";
+
+/** Dana penjual dilepas otomatis sekian jam setelah paket tiba di pos, bila pembeli belum menekan "Pesanan Diterima" dan tidak ada komplain (keputusan D7). */
+export const PELEPASAN_OTOMATIS_JAM = 24;
+
+/** Alat bantu pengembangan (mis. simulasi aksi pembeli). Otomatis hilang pada build produksi. */
+export const MODE_DEMO = process.env.NODE_ENV !== "production";
 
 /** Biaya kurir desa (flat per dusun) dan subsidinya dari kas BUMDes. */
 export const ONGKIR_FLAT = 5000;

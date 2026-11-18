@@ -14,7 +14,7 @@ export function Avatar({ nama, foto, className }: AvatarProps) {
     // eslint-disable-next-line @next/next/no-img-element -- foto berupa data URL dari unggahan pengguna
     <img src={foto} alt="" className={clsx("shrink-0 rounded-full object-cover", className)} />
   ) : (
-    <span className={clsx("flex shrink-0 items-center justify-center rounded-full bg-brand-100 font-semibold text-brand-700", className)}>
+    <span className={clsx("flex shrink-0 items-center justify-center rounded-full bg-brand-600 font-semibold text-white", className)}>
       {inisial(nama) || "?"}
     </span>
   );

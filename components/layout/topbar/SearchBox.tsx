@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { clsx } from "clsx";
-import { Search, SearchX, X } from "lucide-react";
+import { SearchX, X } from "lucide-react";
 import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { useDetail } from "@/components/detail/DetailProvider";
 import { WARTA_LIST } from "@/lib/data/ringkasan";
@@ -74,8 +74,7 @@ export function SearchBox() {
   }
 
   return (
-    <div ref={wadahRef} className="relative max-w-lg flex-1">
-      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
+    <div ref={wadahRef} className="relative max-w-[470px] flex-1">
       <input
         ref={inputRef}
         type="text"
@@ -91,7 +90,7 @@ export function SearchBox() {
         onFocus={() => setFokus(true)}
         onKeyDown={onKeyDown}
         placeholder="Cari pesanan, komoditas, transaksi…  (tekan /)"
-        className="w-full rounded-lg border border-line bg-surface py-2.5 pl-9 pr-9 text-sm text-ink-700 placeholder:text-ink-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+        className="w-full rounded-xl border border-line bg-surface py-2.5 pl-4 pr-9 text-sm text-ink-700 placeholder:text-ink-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
       />
       {query && (
         <button

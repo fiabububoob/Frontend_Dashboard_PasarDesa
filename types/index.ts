@@ -12,3 +12,4 @@ export * from "./pesanan";
 export * from "./kas";
 export * from "./pengaturan";
 export * from "./detail";
+export * from "./pengguna";

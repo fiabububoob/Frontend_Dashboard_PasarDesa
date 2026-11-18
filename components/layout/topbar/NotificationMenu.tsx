@@ -9,6 +9,7 @@ import { buatNotifikasi, type JenisNotifikasi } from "@/lib/notifikasi";
 import { Popover } from "./Popover";
 
 const TAMPILAN: Record<JenisNotifikasi, { icon: LucideIcon; warna: string }> = {
+  komplain: { icon: AlertTriangle, warna: "text-danger-600" },
   dikemas: { icon: Package, warna: "text-warn-600" },
   "stok-kritis": { icon: AlertTriangle, warna: "text-danger-600" },
   kurir: { icon: Bike, warna: "text-brand-600" },
@@ -31,7 +32,7 @@ export function NotificationMenu() {
           aria-label="Notifikasi"
           aria-expanded={buka}
           onClick={toggle}
-          className="relative rounded-lg border border-line p-2.5 text-ink-500 transition-colors duration-feedback ease-enter hover:bg-surface-muted"
+          className="relative rounded-xl border border-line p-2.5 text-ink-500 transition-colors duration-feedback ease-enter hover:bg-surface-muted"
         >
           <Bell className="h-[18px] w-[18px]" />
           {!sudahDibaca && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-danger-600" />}

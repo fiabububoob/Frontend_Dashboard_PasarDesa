@@ -1,7 +1,8 @@
 "use client";
 
 import { clsx } from "clsx";
-import { ChevronDown, UserRound } from "lucide-react";
+import { ChevronDown, LogOut, UserRound } from "lucide-react";
+import { aksiLogout } from "@/app/(auth)/actions";
 import { Avatar } from "@/components/ui/Avatar";
 import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { useDetail } from "@/components/detail/DetailProvider";
@@ -28,7 +29,10 @@ export function ProfileMenu() {
             <span className="block font-medium text-ink-900">{profil.nama}</span>
             <span className="block text-ink-500">Mitra Resmi BUMDes</span>
           </span>
-          <ChevronDown className={clsx("hidden h-3.5 w-3.5 text-ink-400 transition-transform duration-feedback ease-enter sm:block", buka && "rotate-180")} aria-hidden />
+          <ChevronDown
+            className={clsx("hidden h-3.5 w-3.5 text-ink-400 transition-transform duration-feedback ease-enter sm:block", buka && "rotate-180")}
+            aria-hidden
+          />
         </button>
       )}
     >
@@ -55,6 +59,16 @@ export function ProfileMenu() {
             <UserRound className="h-4 w-4 text-ink-400" aria-hidden />
             Edit Profil
           </button>
+          <form action={aksiLogout}>
+            <button
+              type="submit"
+              role="menuitem"
+              className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left text-sm text-danger-600 transition-colors duration-feedback ease-enter hover:bg-danger-50"
+            >
+              <LogOut className="h-4 w-4" aria-hidden />
+              Keluar
+            </button>
+          </form>
         </div>
       )}
     </Popover>
