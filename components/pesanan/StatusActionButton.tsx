@@ -58,7 +58,7 @@ function deskripsiLangkah(p: Pesanan, ke: StatusPesanan): DeskripsiLangkah | nul
 }
 
 const TEKS_MENUNGGU: Partial<Record<StatusPesanan, string>> = {
-  "menunggu-pembayaran": "Menunggu pembayaran pembeli (otomatis lanjut setelah lunas).",
+  "menunggu-pembayaran": "Menunggu pembayaran pembeli (otomatis lanjut setelah Midtrans mengonfirmasi lunas).",
   "tiba-di-pos": "Menunggu pembeli menekan \"Pesanan Diterima\".",
 };
 
@@ -99,7 +99,8 @@ export function StatusActionButton({ pesanan }: { pesanan: Pesanan }) {
       <div className="flex flex-col items-end gap-2">
         <p className="text-sm text-ink-500">{TEKS_MENUNGGU[pesanan.status] ?? "Menunggu pihak lain."}</p>
         {/* Alat pengembangan: meniru sistem/pembeli. Hilang di build produksi. */}
-        {MODE_DEMO && oleh !== "penjual" && (
+        {/* Pesanan Midtrans hanya lanjut lewat konfirmasi gateway; server menolak loncatan manual (gunakan Midtrans Simulator di sandbox). */}
+        {MODE_DEMO && oleh !== "penjual" && !(oleh === "sistem" && pesanan.metodeBayar === "MIDTRANS") && (
           <Button
             variant="ghost"
             size="sm"

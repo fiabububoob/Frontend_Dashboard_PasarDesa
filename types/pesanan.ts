@@ -12,7 +12,14 @@ export type StatusPesanan =
   | "selesai"
   | "dibatalkan";
 
-export type MetodeBayar = "QRIS" | "COD" | "SALDO";
+// "MIDTRANS" = pembayaran lewat gateway (QRIS, Virtual Account, e-wallet, kartu); rinciannya ada di `jenisPembayaran`.
+// "QRIS" dipertahankan untuk pesanan lama sebelum Midtrans.
+export type MetodeBayar = "QRIS" | "MIDTRANS" | "COD" | "SALDO";
+
+// Status dari gateway (kolom payment_status di backend), terpisah dari status pesanan.
+// menunggu: tagihan dibuat, belum dibayar · lunas: Midtrans mengonfirmasi · gagal/kedaluwarsa: tidak jadi dibayar
+// dikembalikan: refund/chargeback tercatat di Midtrans · cod: bayar di tempat
+export type StatusPembayaran = "menunggu" | "lunas" | "gagal" | "kedaluwarsa" | "dikembalikan" | "cod";
 
 export type OpsiPengiriman = "kurir-desa" | "ambil-mandiri";
 
@@ -82,6 +89,20 @@ export interface Pesanan {
   dropPoint: string;
   opsiPengiriman: OpsiPengiriman;
   metodeBayar: MetodeBayar;
+  /** Status pembayaran dari gateway. Kosong pada data lama (sebelum Midtrans). */
+  statusPembayaran?: StatusPembayaran;
+  /** Jenis dari Midtrans: bank_transfer, qris, gopay, shopeepay, credit_card, ... */
+  jenisPembayaran?: string;
+  /** Kanal/bank, mis. "bca", "bni", "permata". */
+  kanalPembayaran?: string;
+  /** Waktu pembayaran dikonfirmasi (ISO). */
+  dibayarPada?: string;
+  /** Batas waktu bayar (ISO); lewat dari ini pesanan dibatalkan otomatis. */
+  batasBayar?: string;
+  /** Dihitung server. Total yang dibayar pembeli = `total` + `biayaKirim` - `diskon`. */
+  biayaKirim?: number;
+  diskon?: number;
+  totalBayar?: number;
   status: StatusPesanan;
   waktu: string;
   /** Waktu paket tiba di pos (ISO). Dana dilepas otomatis sekian jam setelahnya bila pembeli belum menerima. */

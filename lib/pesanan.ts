@@ -88,6 +88,7 @@ export function sisaWaktuPelepasan(p: Pick<Pesanan, "status" | "tibaDiPosPada">,
 // ---------------------------------------------------------------------------
 export const LABEL_METODE_BAYAR: Record<MetodeBayar, string> = {
   QRIS: "QRIS",
+  MIDTRANS: "Midtrans (QRIS / VA / e-wallet)",
   COD: "COD (bayar di tempat)",
   SALDO: "Saldo PasarDesa", // keputusan D5: satu nama untuk saldo pembeli
 };
@@ -97,15 +98,58 @@ export const LABEL_OPSI_PENGIRIMAN: Record<OpsiPengiriman, string> = {
   "ambil-mandiri": "Ambil mandiri di pos",
 };
 
-// Sudah dibayar secara digital (QRIS/Saldo). COD dibayar saat pengambilan, jadi tidak pernah "lunas" di muka.
-export const sudahLunas = (p: Pick<Pesanan, "metodeBayar" | "status">): boolean =>
-  p.metodeBayar !== "COD" && p.status !== "menunggu-pembayaran" && p.status !== "dibatalkan";
+type DataBayar = Pick<Pesanan, "metodeBayar" | "status" | "statusPembayaran" | "jenisPembayaran" | "kanalPembayaran">;
 
-// Teks singkat untuk badge: "QRIS Lunas", "Saldo Lunas", "COD Kasir", "Menunggu Bayar".
-export function labelPembayaran(p: Pick<Pesanan, "metodeBayar" | "status">): string {
+// Nama jenis pembayaran Midtrans yang ramah dibaca ("VA BCA", "QRIS", "GoPay", ...).
+export function labelJenisBayar(jenis?: string, kanal?: string): string {
+  const bank = (kanal ?? "").toUpperCase();
+  switch (jenis) {
+    case "bank_transfer":
+      return bank ? `VA ${bank}` : "Virtual Account";
+    case "echannel":
+      return "VA Mandiri";
+    case "qris":
+      return "QRIS";
+    case "gopay":
+      return "GoPay";
+    case "shopeepay":
+      return "ShopeePay";
+    case "credit_card":
+      return "Kartu Kredit";
+    case "cstore":
+      return "Minimarket";
+    default:
+      return jenis || "Midtrans";
+  }
+}
+
+// Sudah dibayar secara digital. Bila status gateway diketahui, itulah yang menentukan (bukan status pesanan).
+// COD dibayar saat pengambilan, jadi tidak pernah "lunas" di muka.
+export const sudahLunas = (p: Pick<Pesanan, "metodeBayar" | "status" | "statusPembayaran">): boolean => {
+  if (p.statusPembayaran) return p.statusPembayaran === "lunas" && p.status !== "dibatalkan";
+  return p.metodeBayar !== "COD" && p.status !== "menunggu-pembayaran" && p.status !== "dibatalkan";
+};
+
+// Teks singkat untuk badge: "QRIS Lunas", "VA BCA Lunas", "Saldo Lunas", "COD Kasir", "Menunggu Bayar", "Perlu Refund".
+export function labelPembayaran(p: DataBayar): string {
   if (p.metodeBayar === "COD") return "COD Kasir";
+  switch (p.statusPembayaran) {
+    case "menunggu":
+      return "Menunggu Bayar";
+    case "gagal":
+      return "Pembayaran Gagal";
+    case "kedaluwarsa":
+      return "Kedaluwarsa";
+    case "dikembalikan":
+      return "Dikembalikan";
+    case "lunas":
+      // Dana sudah masuk tetapi pesanan batal: uang pembeli harus dikembalikan.
+      if (p.status === "dibatalkan") return "Perlu Refund";
+      break;
+  }
   if (p.status === "menunggu-pembayaran") return "Menunggu Bayar";
-  return `${p.metodeBayar === "SALDO" ? "Saldo" : "QRIS"} ${p.status === "dibatalkan" ? "Dibatalkan" : "Lunas"}`;
+  const nama = p.metodeBayar === "SALDO" ? "Saldo" : p.jenisPembayaran ? labelJenisBayar(p.jenisPembayaran, p.kanalPembayaran) : p.metodeBayar === "MIDTRANS" ? "Midtrans" : "QRIS";
+  return `${nama} ${p.status === "dibatalkan" ? "Dibatalkan" : "Lunas"}`;
 }
 
 // ---------------------------------------------------------------------------

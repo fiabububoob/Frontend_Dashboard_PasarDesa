@@ -14,7 +14,7 @@ import { ONGKIR_FLAT, SUBSIDI_ONGKIR, TANGGAL_DATA_DUMMY } from "@/lib/constants
 import { formatRupiah, waLink } from "@/lib/format";
 import { inisialProduk } from "@/lib/komoditas";
 import { useSekarang } from "@/lib/hooks/useSekarang";
-import { langkahBerikutnya, LABEL_METODE_BAYAR, sisaWaktuPelepasan, sudahLunas } from "@/lib/pesanan";
+import { labelJenisBayar, langkahBerikutnya, LABEL_METODE_BAYAR, sisaWaktuPelepasan, sudahLunas } from "@/lib/pesanan";
 import { cariKomoditasByNama } from "@/lib/stok";
 import type { Pesanan, StatusPesanan } from "@/types";
 
@@ -24,6 +24,10 @@ const waktuWib = (iso: string) => {
   const { tanggal, waktu } = tanggalWib(iso);
   return `${tanggal}, ${waktu}`;
 };
+
+// Ongkir & voucher dari server bila ada (pesanan baru); pesanan lama memakai konstanta dashboard.
+const ongkirPesanan = (p: Pesanan) => p.biayaKirim ?? (p.opsiPengiriman === "kurir-desa" ? ONGKIR_FLAT : 0);
+const diskonPesanan = (p: Pesanan) => p.diskon ?? (p.opsiPengiriman === "kurir-desa" ? SUBSIDI_ONGKIR : 0);
 
 const LANGKAH = ["Diterima", "Sedang Dikemas", "Kurir Menjemput", "Drop-Point"];
 
@@ -156,8 +160,8 @@ export function PesananDrawer({ id }: { id: string }) {
           <Baris label="Subtotal hasil panen" nilai={formatRupiah(subtotal)} />
           {p.opsiPengiriman === "kurir-desa" ? (
             <>
-              <Baris label="Subsidi ongkir logistik desa (BUMDes)" nilai={`-${formatRupiah(SUBSIDI_ONGKIR)}`} className="text-brand-700" />
-              <Baris label="Ongkir kurir desa (flat dusun)" nilai={formatRupiah(ONGKIR_FLAT)} />
+              {diskonPesanan(p) > 0 && <Baris label="Voucher / subsidi ongkir logistik desa" nilai={`-${formatRupiah(diskonPesanan(p))}`} className="text-brand-700" />}
+              <Baris label="Ongkir kurir desa (flat dusun)" nilai={formatRupiah(ongkirPesanan(p))} />
             </>
           ) : (
             <Baris label="Ongkir (ambil mandiri di pos)" nilai={formatRupiah(0)} />
@@ -166,9 +170,18 @@ export function PesananDrawer({ id }: { id: string }) {
             <span className="font-bold text-ink-900">
               {sudahLunas(p) ? "Total pembayaran lunas" : p.metodeBayar === "COD" ? "Total dibayar di tempat (COD)" : "Total tagihan"}
             </span>
-            <span className="text-2xl font-bold text-brand-700">{formatRupiah(p.total)}</span>
+            <span className="text-2xl font-bold text-brand-700">{formatRupiah(p.totalBayar ?? p.total)}</span>
           </div>
-          <p className="text-xs text-ink-500">Metode bayar: {LABEL_METODE_BAYAR[p.metodeBayar]}</p>
+          <p className="text-xs text-ink-500">
+            Metode bayar: {LABEL_METODE_BAYAR[p.metodeBayar]}
+            {p.jenisPembayaran ? ` · ${labelJenisBayar(p.jenisPembayaran, p.kanalPembayaran)}` : ""}
+            {p.dibayarPada ? ` · dibayar ${waktuWib(p.dibayarPada)}` : ""}
+          </p>
+          {p.statusPembayaran === "lunas" && p.status === "dibatalkan" && (
+            <p className="rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
+              Pesanan dibatalkan setelah pembayaran diterima. Dana pembeli perlu dikembalikan lewat dashboard Midtrans.
+            </p>
+          )}
         </section>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
