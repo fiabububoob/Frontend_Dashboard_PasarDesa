@@ -58,3 +58,19 @@ describe("pembatalan dan ulasan", () => {
     expect(pesananDariApi({ ...baris, ulasan: null }).ulasan).toBeUndefined();
   });
 });
+
+describe("pesananDariApi: pembayaran Midtrans", () => {
+  it("memetakan status, jenis, ongkir, dan total bayar dari server", () => {
+    const p = pesananDariApi({ ...baris, metodeBayar: "Midtrans", statusPembayaran: "lunas", jenisPembayaran: "bank_transfer", kanalPembayaran: "bca", dibayarPada: "2026-11-19T03:00:00.000Z", biayaKirim: "5000.00", diskon: "0.00", totalBayar: "97000.00", status: "perlu-dikemas" });
+    expect(p).toMatchObject({ metodeBayar: "MIDTRANS", statusPembayaran: "lunas", jenisPembayaran: "bank_transfer", kanalPembayaran: "bca", biayaKirim: 5000, diskon: 0, totalBayar: 97000 });
+  });
+  it("data lama tanpa kolom pembayaran tetap aman", () => {
+    const p = pesananDariApi(baris);
+    expect(p.statusPembayaran).toBeUndefined();
+    expect(p.totalBayar).toBeUndefined();
+  });
+  it("status pembayaran tak dikenal diabaikan", () => {
+    expect(pesananDariApi({ ...baris, statusPembayaran: "aneh" }).statusPembayaran).toBeUndefined();
+  });
+});
+

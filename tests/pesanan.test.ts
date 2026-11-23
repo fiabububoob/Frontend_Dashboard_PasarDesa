@@ -108,3 +108,18 @@ describe("penyaring", () => {
     expect(pesananDiTab(PESANAN_LIST, PESANAN_TABS[0])).toHaveLength(PESANAN_LIST.length);
   });
 });
+
+describe("pembayaran Midtrans", () => {
+  it("status gateway menentukan lunas, bukan status pesanan", () => {
+    expect(sudahLunas({ metodeBayar: "MIDTRANS", status: "perlu-dikemas", statusPembayaran: "lunas" })).toBe(true);
+    expect(sudahLunas({ metodeBayar: "MIDTRANS", status: "menunggu-pembayaran", statusPembayaran: "menunggu" })).toBe(false);
+    expect(sudahLunas({ metodeBayar: "MIDTRANS", status: "dibatalkan", statusPembayaran: "lunas" })).toBe(false);
+  });
+  it("label menampilkan jenis pembayaran dan kasus perlu refund", () => {
+    expect(labelPembayaran({ metodeBayar: "MIDTRANS", status: "perlu-dikemas", statusPembayaran: "lunas", jenisPembayaran: "bank_transfer", kanalPembayaran: "bca" })).toBe("VA BCA Lunas");
+    expect(labelPembayaran({ metodeBayar: "MIDTRANS", status: "perlu-dikemas", statusPembayaran: "lunas", jenisPembayaran: "qris" })).toBe("QRIS Lunas");
+    expect(labelPembayaran({ metodeBayar: "MIDTRANS", status: "menunggu-pembayaran", statusPembayaran: "menunggu" })).toBe("Menunggu Bayar");
+    expect(labelPembayaran({ metodeBayar: "MIDTRANS", status: "dibatalkan", statusPembayaran: "kedaluwarsa" })).toBe("Kedaluwarsa");
+    expect(labelPembayaran({ metodeBayar: "MIDTRANS", status: "dibatalkan", statusPembayaran: "lunas", jenisPembayaran: "qris" })).toBe("Perlu Refund");
+  });
+});
