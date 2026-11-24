@@ -12,11 +12,10 @@ import { KATEGORI_INDUK } from "@/lib/data/kategori";
 import {
   LABEL_JENIS_SUMBER,
   OPSI_AREA_ANTAR,
-  OPSI_BATAS_KLAIM,
   OPSI_ESTIMASI,
   OPSI_GARANSI,
+  NAMA_BULAN,
   OPSI_KETERSEDIAAN,
-  OPSI_LOKASI_AMBIL,
   OPSI_SATUAN,
   isianSpesifikasi,
 } from "@/lib/data/komoditasOpsi";
@@ -162,6 +161,37 @@ export function LangkahHargaStok({ draft, update, error }: LangkahProps) {
           ))}
         </Select>
       </Field>
+      <div className="sm:col-span-2">
+        <Field
+          label="Musim tersedia"
+          htmlFor="kmd-musim-mulai"
+          hint="Opsional. Kosongkan bila tersedia sepanjang tahun. Di luar musim, produk tampil “Belum musim” di aplikasi warga."
+        >
+          <div className="grid grid-cols-2 gap-3">
+            <Select id="kmd-musim-mulai" aria-label="Bulan mulai musim" value={draft.musimMulai} onChange={(e) => update({ musimMulai: e.target.value })}>
+              <option value="">Dari bulan</option>
+              {NAMA_BULAN.map((b, i) => (
+                <option key={b} value={String(i + 1)}>
+                  {b}
+                </option>
+              ))}
+            </Select>
+            <Select id="kmd-musim-selesai" aria-label="Bulan selesai musim" value={draft.musimSelesai} onChange={(e) => update({ musimSelesai: e.target.value })}>
+              <option value="">Sampai bulan</option>
+              {NAMA_BULAN.map((b, i) => (
+                <option key={b} value={String(i + 1)}>
+                  {b}
+                </option>
+              ))}
+            </Select>
+          </div>
+        </Field>
+        {error.musim && (
+          <p role="alert" className="mt-1.5 text-xs text-danger-600">
+            {error.musim}
+          </p>
+        )}
+      </div>
       <Field label="Minimal beli" htmlFor="kmd-min">
         <Input id="kmd-min" type="number" inputMode="numeric" min={1} step={1} placeholder="1" value={draft.minBeli} onChange={(e) => update({ minBeli: e.target.value })} />
       </Field>
@@ -303,14 +333,6 @@ export function LangkahPengiriman({ draft, update, error }: LangkahProps) {
         <Field label="Jam order terakhir" htmlFor="kmd-jam">
           <Input id="kmd-jam" type="time" value={draft.jamOrderTerakhir} onChange={(e) => update({ jamOrderTerakhir: e.target.value })} />
         </Field>
-        <Field label="Lokasi ambil" htmlFor="kmd-lokasi">
-          <Select id="kmd-lokasi" value={draft.lokasiAmbil} onChange={(e) => update({ lokasiAmbil: e.target.value })}>
-            <Pilih>Pilih lokasi</Pilih>
-            {denganNilai(OPSI_LOKASI_AMBIL, draft.lokasiAmbil).map((o) => (
-              <option key={o}>{o}</option>
-            ))}
-          </Select>
-        </Field>
         <Field label="Berat kirim (kg)" htmlFor="kmd-berat">
           <Input id="kmd-berat" type="number" inputMode="decimal" min={0} step={0.1} placeholder="0" value={draft.beratKirimKg} onChange={(e) => update({ beratKirimKg: e.target.value })} />
         </Field>
@@ -330,19 +352,9 @@ export function LangkahPengiriman({ draft, update, error }: LangkahProps) {
         </div>
       </div>
 
-      <Grid>
-        <Field label="Batas waktu klaim" htmlFor="kmd-klaim">
-          <Select id="kmd-klaim" disabled={!draft.bisaDiklaim} value={draft.batasKlaim} onChange={(e) => update({ batasKlaim: e.target.value })}>
-            <Pilih>Pilih batas</Pilih>
-            {denganNilai(OPSI_BATAS_KLAIM, draft.batasKlaim).map((o) => (
-              <option key={o}>{o}</option>
-            ))}
-          </Select>
-        </Field>
-        <Field label="Catatan kebijakan" htmlFor="kmd-catatan">
-          <Input id="kmd-catatan" value={draft.catatanKebijakan} onChange={(e) => update({ catatanKebijakan: e.target.value })} placeholder="Opsional" />
-        </Field>
-      </Grid>
+      <Field label="Catatan kebijakan" htmlFor="kmd-catatan">
+        <Input id="kmd-catatan" value={draft.catatanKebijakan} onChange={(e) => update({ catatanKebijakan: e.target.value })} placeholder="Opsional" />
+      </Field>
     </div>
   );
 }

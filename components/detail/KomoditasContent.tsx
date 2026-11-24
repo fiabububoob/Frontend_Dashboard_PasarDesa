@@ -104,7 +104,7 @@ export function KomoditasContent({ id }: { id: string }) {
                     <span className="block font-medium text-ink-900">#{p.id}</span>
                     <span className="block text-xs text-ink-500">{p.pembeli}</span>
                   </span>
-                  <StatusBadge status={p.status} />
+                  <StatusBadge pesanan={p} />
                 </button>
               </li>
             ))}

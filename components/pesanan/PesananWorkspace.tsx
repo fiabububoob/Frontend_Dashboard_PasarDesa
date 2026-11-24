@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { SearchX } from "lucide-react";
+import { Eye, FileText, SearchX } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -14,7 +14,7 @@ import { useDetail } from "@/components/detail/DetailProvider";
 import { INTERVAL_REFRESH_DATA_MS } from "@/lib/constants";
 import { formatJam } from "@/lib/format";
 import { usePaginasi } from "@/lib/hooks/usePaginasi";
-import { labelPembayaran, pesananDiTab, STATUS_LABEL } from "@/lib/pesanan";
+import { labelPembayaran, labelStatus, pesananDiTab } from "@/lib/pesanan";
 import { statPesanan } from "@/lib/stats";
 import { stagger } from "@/lib/motion";
 import { cocokSemuaKata } from "@/lib/text";
@@ -45,7 +45,7 @@ export function PesananWorkspace() {
 
   const tabAktif = PESANAN_TABS.find((t) => t.label === tab) ?? PESANAN_TABS[0];
   const hasil = useMemo(
-    () => pesananDiTab(pesanan, tabAktif).filter((p) => cocokSemuaKata(query, p.id, p.pembeli, p.alamat, p.dropPoint, STATUS_LABEL[p.status], ...p.items.map((i) => i.komoditas))),
+    () => pesananDiTab(pesanan, tabAktif).filter((p) => cocokSemuaKata(query, p.id, p.pembeli, p.alamat, p.dropPoint, labelStatus(p), ...p.items.map((i) => i.komoditas))),
     [pesanan, tabAktif, query],
   );
   const { halaman, totalHalaman, itemHalaman: tampil, setHalaman } = usePaginasi(hasil, `${tab}|${query}`, UKURAN_HALAMAN_PESANAN);
@@ -76,12 +76,16 @@ export function PesananWorkspace() {
         title="Pesanan"
         description="Siapkan dan lacak pesanan sebelum dijemput kurir desa."
         actions={
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
             <p className="text-sm text-ink-500" aria-live="polite">
               {jam && `Diperbarui ${jam} WIB`}
             </p>
             <Button variant="secondary" className="border-brand-600 text-brand-700" onClick={() => open({ type: "surat-jalan" })}>
               Cetak Surat Jalan
+            </Button>
+            <Button onClick={() => open({ type: "laporan-pesanan" })}>
+              <FileText className="h-4 w-4" />
+              Cetak Laporan
             </Button>
           </div>
         }
@@ -121,7 +125,7 @@ export function PesananWorkspace() {
           />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[860px] text-left text-sm">
+            <table className="w-full min-w-[760px] text-left text-sm">
               <thead>
                 <tr className="border-y border-line bg-surface-muted text-[11px] font-semibold uppercase tracking-wider text-ink-500">
                   <th className="w-12 py-3 pl-6">
@@ -142,22 +146,22 @@ export function PesananWorkspace() {
                       <input type="checkbox" aria-label={`Pilih pesanan ${p.id}`} checked={terpilih.has(p.id)} onChange={(e) => ubahPilihan(p.id, e.target.checked)} className="h-4 w-4 rounded border-line accent-brand-600" />
                     </td>
                     <td className="px-3 py-4">
-                      <p className="font-bold text-ink-900">#{p.id}</p>
+                      <p className="whitespace-nowrap font-bold text-ink-900">#{p.id}</p>
                       <p className="text-xs text-ink-500">{p.waktu}</p>
                     </td>
                     <td className="px-3 py-4">
                       <p className="font-bold text-ink-900">{p.pembeli}</p>
-                      <p className="text-xs text-ink-500">{p.alamat}</p>
                     </td>
                     <td className="px-3 py-4 text-ink-900">{labelPembayaran(p)}</td>
                     <td className="whitespace-nowrap px-3 py-4 font-bold text-ink-900">{formatRupiah(p.total)}</td>
                     <td className="px-3 py-4">
-                      <StatusBadge status={p.status} />
+                      <StatusBadge pesanan={p} />
                       {p.status === "dibatalkan" && p.dibatalkanOleh && <p className="mt-1 text-xs text-ink-500">oleh {p.dibatalkanOleh}</p>}
                     </td>
                     <td className="px-6 py-4">
-                      <button type="button" onClick={() => open({ type: "pesanan", id: p.id })} className="text-sm font-bold text-brand-600 hover:underline">
-                        Lihat Detail
+                      <button type="button" onClick={() => open({ type: "pesanan", id: p.id })} className="inline-flex items-center gap-1.5 whitespace-nowrap text-sm font-bold text-brand-600 hover:underline">
+                        <Eye className="h-4 w-4" aria-hidden />
+                        Detail
                       </button>
                     </td>
                   </tr>

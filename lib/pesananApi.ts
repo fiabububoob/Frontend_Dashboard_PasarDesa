@@ -112,6 +112,7 @@ export function pesananDariApi(b: BarisPesananApi): Pesanan {
     totalBayar: angkaAtauUndefined(b.totalBayar),
     status: statusDariApi(b.status),
     waktu: tanggalWib(b.dibuatPada).waktu,
+    dibuatPada: b.dibuatPada,
     tibaDiPosPada: b.tibaDiPosPada ?? undefined,
     total: Number(b.total) || 0,
     items: b.items.map((i) => ({

@@ -1,5 +1,6 @@
 {
     "compareFolders.excludeFilter": [
-        "/lib"
+        "/lib",
+        "/tests\\pesanan.test.ts"
     ]
 }

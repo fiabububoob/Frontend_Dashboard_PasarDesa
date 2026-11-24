@@ -3,7 +3,7 @@
 import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { formatRupiah, formatTanggal } from "@/lib/format";
 import { PrintActions } from "./PrintActions";
-import { LABEL_METODE_BAYAR, STATUS_LABEL, sudahLunas } from "@/lib/pesanan";
+import { LABEL_METODE_BAYAR, labelStatus, sudahLunas } from "@/lib/pesanan";
 
 // Nota pembelian + label tempel untuk drop-point. Hanya area .print-area yang
 // tercetak (lihat @media print di globals.css); label diberi halaman sendiri
@@ -101,7 +101,7 @@ export function NotaContent({ id }: { id: string }) {
               </div>
             </div>
             {p.catatan && <p className="mt-3 rounded-lg bg-surface-muted p-2 text-xs italic text-ink-700">Catatan: &ldquo;{p.catatan}&rdquo;</p>}
-            <p className="mt-3 text-[11px] text-ink-400">Status: {STATUS_LABEL[p.status]}</p>
+            <p className="mt-3 text-[11px] text-ink-400">Status: {labelStatus(p)}</p>
           </div>
         </section>
       </div>

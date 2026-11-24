@@ -51,7 +51,7 @@ export function KomoditasForm({ id }: { id?: string }) {
   // Langkah ini valid bila isian wajibnya terisi dan tidak ada galat khusus untuk langkah tersebut.
   const langkahValid = (n: number) => {
     if (formRef.current && !formRef.current.reportValidity()) return false;
-    if (n === 1 && (error.stok || error.hargaCoret)) return false;
+    if (n === 1 && (error.stok || error.hargaCoret || error.musim)) return false;
     if (n === TERAKHIR && error.pengiriman) return false;
     return true;
   };
@@ -59,6 +59,9 @@ export function KomoditasForm({ id }: { id?: string }) {
   const kembali = () => setLangkah((n) => Math.max(0, n - 1));
 
   function kirim(sebagaiDraft: boolean) {
+    // Mode edit boleh melompat antar langkah, jadi galat di langkah lain juga harus menahan simpan.
+    if (error.stok || error.hargaCoret || error.musim) return setLangkah(1);
+    if (error.pengiriman) return setLangkah(TERAKHIR);
     if (!langkahValid(langkah)) return;
     const data = dataDariDraft(draft);
     const asalPanen = data.spesifikasi?.find((s) => s.label === "Asal Panen")?.nilai;

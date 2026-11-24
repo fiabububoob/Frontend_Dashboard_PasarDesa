@@ -30,6 +30,7 @@ const ongkirPesanan = (p: Pesanan) => p.biayaKirim ?? (p.opsiPengiriman === "kur
 const diskonPesanan = (p: Pesanan) => p.diskon ?? (p.opsiPengiriman === "kurir-desa" ? SUBSIDI_ONGKIR : 0);
 
 const LANGKAH = ["Diterima", "Sedang Dikemas", "Kurir Menjemput", "Drop-Point"];
+const LANGKAH_AMBIL = ["Diterima", "Sedang Dikemas", "Siap Diambil", "Diterima Pembeli"];
 
 // Posisi pesanan pada garis progres 4 tahap (indeks langkah aktif).
 const POSISI: Record<StatusPesanan, number> = {
@@ -41,6 +42,14 @@ const POSISI: Record<StatusPesanan, number> = {
   komplain: 3,
   selesai: 3,
   dibatalkan: 0,
+};
+
+// Posisi untuk ambil mandiri: tidak ada tahap kurir, jadi "tiba-di-pos" = siap diambil (tahap 3) dan "selesai" = diterima (tahap 4).
+const POSISI_AMBIL: Record<StatusPesanan, number> = { ...POSISI, "siap-jemput": 2, diantar: 2, "tiba-di-pos": 2, komplain: 2, selesai: 3 };
+
+const CATATAN_AKSI_AMBIL: Partial<Record<StatusPesanan, string>> = {
+  "perlu-dikemas": "Kemas pesanan lalu tandai siap diambil di pos. Pembeli datang sendiri, tanpa kurir.",
+  "tiba-di-pos": "Pesanan siap di pos. Pembeli menekan \"Pesanan Diterima\" di aplikasi setelah mengambilnya; dana Anda dilepas setelah itu.",
 };
 
 const CATATAN_AKSI: Record<StatusPesanan, string> = {
@@ -99,17 +108,18 @@ export function PesananDrawer({ id }: { id: string }) {
 
   const subtotal = p.items.reduce((sum, i) => sum + i.subtotal, 0);
   const sisa = sekarang ? sisaWaktuPelepasan(p, sekarang) : undefined;
-  const pesanWa = `Halo ${p.pembeli}, pesanan #${p.id} dari BUMDes Sukorejo sedang kami proses. Drop-point: ${p.dropPoint}.`;
+  const pesanWa = `Halo ${p.pembeli}, pesanan #${p.id} dari BUMDes Sukorejo sedang kami proses. ${p.opsiPengiriman === "ambil-mandiri" ? "Lokasi ambil" : "Drop-point"}: ${p.dropPoint}.`;
   const adaLangkah = langkahBerikutnya(p) !== null;
+  const mandiri = p.opsiPengiriman === "ambil-mandiri";
   const jamMasuk = p.waktu.replace(/\s*WIB$/, "");
 
   return (
     <Drawer
       title={`Pesanan #${p.id}`}
       subtitle={`Masuk ${TANGGAL_DATA_DUMMY}, ${jamMasuk} WIB`}
-      badge={<StatusBadge status={p.status} />}
+      badge={<StatusBadge pesanan={p} />}
       onClose={close}
-      stepper={<Stepper steps={LANGKAH} current={POSISI[p.status]} />}
+      stepper={<Stepper steps={mandiri ? LANGKAH_AMBIL : LANGKAH} current={(mandiri ? POSISI_AMBIL : POSISI)[p.status]} />}
       footer={(tutup) => (
         <>
           <button type="button" onClick={() => push({ type: "nota", id: p.id })} className="rounded-lg px-1 py-2 text-sm font-semibold text-ink-700 hover:text-ink-900">
@@ -188,7 +198,7 @@ export function PesananDrawer({ id }: { id: string }) {
           <Kartu judul="Pembeli">
             <p className="mt-1.5 font-bold text-ink-900">{p.pembeli}</p>
             <p className="text-ink-700">{p.rtRw ? `${p.alamat.split(" RT")[0]} ${p.rtRw}` : p.alamat}</p>
-            <p className="text-ink-700">Drop-point: {p.dropPoint}</p>
+            <p className="text-ink-700">{mandiri ? "Ambil di" : "Drop-point"}: {p.dropPoint}</p>
             {p.patokan && <p className="text-ink-500">Patokan: {p.patokan}</p>}
             {p.telepon ? (
               <a href={waLink(p.telepon, pesanWa)} target="_blank" rel="noopener noreferrer" className="mt-1.5 inline-block font-semibold text-brand-600 hover:underline">
@@ -246,7 +256,7 @@ export function PesananDrawer({ id }: { id: string }) {
         {p.komplain && <KomplainPanel key={`${p.id}-${p.komplain.status}`} pesanan={p} />}
 
         <p className="text-xs text-ink-500">
-          {CATATAN_AKSI[p.status]}
+          {(mandiri && CATATAN_AKSI_AMBIL[p.status]) || CATATAN_AKSI[p.status]}
           {sisa && ` Bila pembeli belum menerima, dana dilepas otomatis ${sisa} (selama tidak ada komplain).`}
         </p>
       </div>

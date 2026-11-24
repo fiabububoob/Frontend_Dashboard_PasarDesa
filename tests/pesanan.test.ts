@@ -4,14 +4,17 @@ import {
   butuhKurir,
   jatuhTempoPelepasan,
   labelPembayaran,
+  labelStatus,
   langkahBerikutnya,
   perluDijemput,
   pesananDiTab,
   pesananJatuhTempo,
   sisaWaktuPelepasan,
+  statusPaketSiap,
   sudahLunas,
   terapkanStatus,
 } from "@/lib/pesanan";
+import { BATAS_KLAIM_LABEL, PELEPASAN_OTOMATIS_JAM } from "@/lib/constants";
 import type { Pesanan } from "@/types";
 
 const KURIR = { opsiPengiriman: "kurir-desa" as const };
@@ -28,8 +31,15 @@ describe("langkahBerikutnya (siapa mengubah apa — keputusan D4)", () => {
     expect(langkahBerikutnya({ status: "siap-jemput", ...KURIR })).toEqual({ ke: "diantar", oleh: "penjual" });
     expect(langkahBerikutnya({ status: "diantar", ...KURIR })).toEqual({ ke: "tiba-di-pos", oleh: "penjual" });
   });
-  it("ambil mandiri melewati tahap diantar", () => {
-    expect(langkahBerikutnya({ status: "siap-jemput", ...MANDIRI })).toEqual({ ke: "tiba-di-pos", oleh: "penjual" });
+  it("ambil mandiri tanpa kurir: dikemas langsung siap diambil di pos", () => {
+    expect(langkahBerikutnya({ status: "perlu-dikemas", ...MANDIRI })).toEqual({ ke: "tiba-di-pos", oleh: "penjual" });
+    expect(langkahBerikutnya({ status: "siap-jemput", ...MANDIRI })).toEqual({ ke: "tiba-di-pos", oleh: "penjual" }); // data lama
+  });
+  it("statusPaketSiap & labelStatus mengikuti opsi pengiriman", () => {
+    expect(statusPaketSiap(KURIR)).toBe("siap-jemput");
+    expect(statusPaketSiap(MANDIRI)).toBe("tiba-di-pos");
+    expect(labelStatus({ status: "tiba-di-pos", ...MANDIRI })).toBe("Siap Diambil di Pos");
+    expect(labelStatus({ status: "tiba-di-pos", ...KURIR })).toBe("Tiba di Pos");
   });
   it("pembeli yang menyelesaikan pesanan", () => {
     expect(langkahBerikutnya({ status: "tiba-di-pos", ...KURIR })).toEqual({ ke: "selesai", oleh: "pembeli" });
@@ -61,22 +71,31 @@ describe("terapkanStatus & butuhKurir", () => {
 describe("pelepasan dana otomatis (keputusan D7)", () => {
   const tiba = (iso?: string): Pesanan => ({ ...dasar, status: "tiba-di-pos", tibaDiPosPada: iso });
 
-  it("jatuh tempo 24 jam setelah tiba di pos", () => {
-    expect(jatuhTempoPelepasan(tiba("2023-10-23T10:00:00.000Z"))?.toISOString()).toBe("2023-10-24T10:00:00.000Z");
+  // Titik waktu relatif terhadap SEKARANG: `jamLalu(n)` = n jam sebelum SEKARANG.
+  const jamLalu = (n: number) => new Date(SEKARANG.getTime() - n * 3_600_000).toISOString();
+
+  it("keputusan: dana dilepas 48 jam setelah tiba di pos", () => {
+    expect(PELEPASAN_OTOMATIS_JAM).toBe(48);
+  });
+  it("batas klaim pembeli = jendela pelepasan dana (2×24 jam sejak tiba di pos)", () => {
+    expect(BATAS_KLAIM_LABEL).toBe("2×24 jam");
+  });
+  it("jatuh tempo tepat PELEPASAN_OTOMATIS_JAM setelah tiba di pos", () => {
+    expect(jatuhTempoPelepasan(tiba("2023-10-23T10:00:00.000Z"))?.toISOString()).toBe("2023-10-25T10:00:00.000Z");
   });
   it("tidak berlaku bila belum tiba di pos atau tanpa waktu tercatat", () => {
     expect(jatuhTempoPelepasan({ status: "diantar", tibaDiPosPada: "2023-10-23T10:00:00.000Z" })).toBeUndefined();
     expect(jatuhTempoPelepasan(tiba(undefined))).toBeUndefined();
   });
   it("pesananJatuhTempo hanya memilih yang sudah lewat batas", () => {
-    const lewat = tiba("2023-10-23T09:00:00.000Z");
-    const belum = { ...tiba("2023-10-24T08:00:00.000Z"), id: "lain" };
+    const lewat = tiba(jamLalu(PELEPASAN_OTOMATIS_JAM + 1));
+    const belum = { ...tiba(jamLalu(PELEPASAN_OTOMATIS_JAM - 2)), id: "lain" };
     expect(pesananJatuhTempo([lewat, belum], SEKARANG)).toEqual([lewat]);
   });
   it("sisaWaktuPelepasan menjelaskan sisa jam", () => {
-    expect(sisaWaktuPelepasan(tiba("2023-10-24T08:00:00.000Z"), SEKARANG)).toBe("sekitar 22 jam lagi");
-    expect(sisaWaktuPelepasan(tiba("2023-10-23T10:30:00.000Z"), SEKARANG)).toBe("kurang dari 1 jam lagi");
-    expect(sisaWaktuPelepasan(tiba("2023-10-22T10:00:00.000Z"), SEKARANG)).toBe("segera");
+    expect(sisaWaktuPelepasan(tiba(jamLalu(PELEPASAN_OTOMATIS_JAM - 22)), SEKARANG)).toBe("sekitar 22 jam lagi");
+    expect(sisaWaktuPelepasan(tiba(jamLalu(PELEPASAN_OTOMATIS_JAM - 0.5)), SEKARANG)).toBe("kurang dari 1 jam lagi");
+    expect(sisaWaktuPelepasan(tiba(jamLalu(PELEPASAN_OTOMATIS_JAM + 1)), SEKARANG)).toBe("segera");
   });
 });
 

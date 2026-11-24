@@ -1,6 +1,6 @@
 import { indukNama } from "./komoditas";
 import { hitungStatusStok } from "./stok";
-import type { BadgeProduk, Komoditas, PengirimanKomoditas, Spesifikasi, SumberKomoditas } from "@/types";
+import type { BadgeProduk, Komoditas, MusimKomoditas, PengirimanKomoditas, Spesifikasi, SumberKomoditas } from "@/types";
 
 // Baris produk dari Express API (GET /api/products). Kolom `detail` (JSON) menampung isian kaya dashboard.
 export interface DetailKomoditasApi {
@@ -18,6 +18,7 @@ export interface DetailKomoditasApi {
   keunggulan?: string[];
   garansiMutu?: string;
   pengiriman?: PengirimanKomoditas;
+  musim?: MusimKomoditas;
 }
 
 export interface BarisKomoditasApi {
@@ -96,6 +97,7 @@ export function komoditasDariApi(b: BarisKomoditasApi): Komoditas {
     keunggulan: d.keunggulan,
     garansiMutu: d.garansiMutu,
     pengiriman: d.pengiriman,
+    musim: d.musim,
   };
 }
 
@@ -116,6 +118,7 @@ export function isianKeApi(k: Omit<Komoditas, "id" | "statusStok"> & { id?: stri
     keunggulan: k.keunggulan,
     garansiMutu: k.garansiMutu,
     pengiriman: k.pengiriman,
+    musim: k.musim,
   };
   const teks = (v: string | number | undefined | null) => (v === undefined || v === null ? "" : String(v));
   return {

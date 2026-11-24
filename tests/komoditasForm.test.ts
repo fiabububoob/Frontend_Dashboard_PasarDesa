@@ -66,3 +66,42 @@ describe("errorDraft", () => {
     expect(errorDraft({ ...dasar, harga: "10000", hargaCoret: "" }).hargaCoret).toBeUndefined();
   });
 });
+
+describe("musim tersedia", () => {
+  const dasar = () => ({ ...draftKosong(new Date("2023-10-23T03:00:00Z")), nama: "Durian", harga: "50000", stok: "10", stokMaks: "20", satuan: "kg", asalBlok: "A" });
+
+  it("kosong = sepanjang tahun, tanpa error", () => {
+    const d = dasar();
+    expect(errorDraft(d).musim).toBeUndefined();
+    expect(dataDariDraft(d).musim).toBeUndefined();
+  });
+  it("harus diisi kedua-duanya atau kosong keduanya", () => {
+    expect(errorDraft({ ...dasar(), musimMulai: "5" }).musim).toBeDefined();
+    expect(errorDraft({ ...dasar(), musimSelesai: "8" }).musim).toBeDefined();
+    expect(adaError(errorDraft({ ...dasar(), musimMulai: "5" }))).toBe(true);
+  });
+  it("diubah ke angka bulan saat disimpan, dan kembali ke isian saat diedit", () => {
+    const data = dataDariDraft({ ...dasar(), musimMulai: "11", musimSelesai: "2" });
+    expect(data.musim).toEqual({ mulai: 11, selesai: 2 });
+    const k = { ...KOMODITAS_LIST[0], musim: { mulai: 5, selesai: 8 } };
+    const d = draftDari(k);
+    expect(d.musimMulai).toBe("5");
+    expect(d.musimSelesai).toBe("8");
+  });
+  it("lokasi ambil tidak lagi menjadi isian form", () => {
+    expect("lokasiAmbil" in dasar()).toBe(false);
+    expect(dataDariDraft(dasar()).pengiriman).not.toHaveProperty("lokasiAmbil");
+  });
+});
+
+describe("batas klaim", () => {
+  const dasar = () => ({ ...draftKosong(new Date("2023-10-23T03:00:00Z")), nama: "Durian", harga: "50000", stok: "10", stokMaks: "20", satuan: "kg", asalBlok: "A" });
+
+  it("tidak lagi dipilih per produk: selalu 2×24 jam bila bisa diklaim", () => {
+    expect("batasKlaim" in dasar()).toBe(false);
+    expect(dataDariDraft({ ...dasar(), bisaDiklaim: true }).pengiriman?.batasKlaim).toBe("2×24 jam");
+  });
+  it("tidak ada batas bila produk tidak bisa diklaim", () => {
+    expect(dataDariDraft({ ...dasar(), bisaDiklaim: false }).pengiriman?.batasKlaim).toBeUndefined();
+  });
+});

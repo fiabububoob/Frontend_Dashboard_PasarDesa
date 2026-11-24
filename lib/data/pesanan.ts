@@ -31,9 +31,16 @@ function item(komoditas: string, qty: number, satuan: string, harga: number, tag
   return { komoditas, jumlah: `${qty} ${satuan} x ${formatRupiah(harga)}`, hargaSatuan: harga, subtotal: qty * harga, tag };
 }
 
+// Data contoh: tanggal diambil dari kode pesanan (PSD-20261024-0089) dan jam dari `waktu` ("14:15 WIB").
+function waktuDibuat(id: string, waktu: string): string | undefined {
+  const t = /-(\d{4})(\d{2})(\d{2})-/.exec(id);
+  const j = /(\d{2}):(\d{2})/.exec(waktu);
+  return t && j ? `${t[1]}-${t[2]}-${t[3]}T${j[1]}:${j[2]}:00+07:00` : undefined;
+}
+
 function pesanan(p: Omit<Pesanan, "total" | "inisial" | "opsiPengiriman"> & { inisial?: string; opsiPengiriman?: Pesanan["opsiPengiriman"] }): Pesanan {
   const inisial = p.inisial ?? p.pembeli.replace(/^(Pak|Ibu|Bu|Mas|Mbak|Warung)\s+/i, "").split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
-  return { opsiPengiriman: "kurir-desa", ...p, inisial, total: p.items.reduce((sum, i) => sum + i.subtotal, 0) };
+  return { opsiPengiriman: "kurir-desa", dibuatPada: waktuDibuat(p.id, p.waktu), ...p, inisial, total: p.items.reduce((sum, i) => sum + i.subtotal, 0) };
 }
 
 // Waktu relatif terhadap saat modul dimuat, supaya contoh "tiba di pos" selalu tampak baru

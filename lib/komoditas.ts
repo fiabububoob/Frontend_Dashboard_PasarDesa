@@ -1,5 +1,6 @@
 import type { BadgeProduk, Komoditas, KomoditasBaru, KomoditasUbah, SumberKomoditas } from "@/types";
 import { BADGE_PRODUK } from "./data/badgeProduk";
+import { NAMA_BULAN } from "./data/komoditasOpsi";
 import { formatTanggal, isoTanggal } from "./format";
 import { indukDari } from "./kategori";
 import { hitungStatusStok } from "./stok";
@@ -21,7 +22,8 @@ export function buatSkuBaru(daftar: Komoditas[], nama: string): string {
   const kode = kodeSku(nama);
   let nomor = daftar.filter((k) => k.sku.startsWith(`SKR-${kode}-`)).length + 1;
   const format = (n: number) => `SKR-${kode}-${String(n).padStart(2, "0")}`;
-  while (daftar.some((k) => k.id === format(nomor))) nomor += 1;
+  // Cocokkan ke `sku`, bukan `id`: id dari server berupa nomor baris database, bukan SKU.
+  while (daftar.some((k) => k.sku === format(nomor))) nomor += 1;
   return format(nomor);
 }
 
@@ -84,6 +86,18 @@ export function waktuPanenLabel(k: Pick<Komoditas, "tanggalPanen" | "waktuPanen"
   if (hariLalu === 1) return "Kemarin";
   if (hariLalu < BATAS_HARI_RELATIF) return `${hariLalu} hari lalu`;
   return tanggalDariIso(k.tanggalPanen);
+}
+
+// Produk tanpa musim tersedia sepanjang tahun. Musim boleh melewati akhir tahun (mulai 11, selesai 2).
+export function dalamMusim(musim: Komoditas["musim"], sekarang: Date): boolean {
+  if (!musim) return true;
+  const bulan = Number(isoTanggal(sekarang).slice(5, 7));
+  return musim.mulai <= musim.selesai ? bulan >= musim.mulai && bulan <= musim.selesai : bulan >= musim.mulai || bulan <= musim.selesai;
+}
+
+export function labelMusim(musim: Komoditas["musim"]): string {
+  if (!musim) return "Sepanjang tahun";
+  return `${NAMA_BULAN[musim.mulai - 1]} – ${NAMA_BULAN[musim.selesai - 1]}`;
 }
 
 export const labelBadge = (kode: BadgeProduk): string => BADGE_PRODUK.find((b) => b.kode === kode)?.label ?? kode;

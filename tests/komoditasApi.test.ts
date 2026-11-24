@@ -43,3 +43,15 @@ describe("isianKeApi", () => {
     expect(isian.batas_stok_rendah).toBe("");
   });
 });
+
+describe("musim tersedia di kolom detail", () => {
+  it("dibaca dari API dan dikirim kembali", () => {
+    const k = komoditasDariApi({ ...baris, detail: JSON.stringify({ musim: { mulai: 5, selesai: 8 } }) });
+    expect(k.musim).toEqual({ mulai: 5, selesai: 8 });
+    const detail = JSON.parse(isianKeApi(k).detail);
+    expect(detail.musim).toEqual({ mulai: 5, selesai: 8 });
+  });
+  it("produk lama tanpa musim tetap sepanjang tahun", () => {
+    expect(komoditasDariApi(baris).musim).toBeUndefined();
+  });
+});

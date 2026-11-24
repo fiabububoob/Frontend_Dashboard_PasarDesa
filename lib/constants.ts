@@ -36,7 +36,10 @@ export const MAKS_SARAN_PENYIMPANAN = 200;
 export const JAM_JEMPUT_SORE = "15:00 WIB";
 
 /** Dana penjual dilepas otomatis sekian jam setelah paket tiba di pos, bila pembeli belum menekan "Pesanan Diterima" dan tidak ada komplain (keputusan D7). */
-export const PELEPASAN_OTOMATIS_JAM = 24;
+export const PELEPASAN_OTOMATIS_JAM = 48;
+
+/** Batas pembeli mengajukan klaim/komplain, dihitung sejak paket tiba di pos. Sama dengan jendela pelepasan dana, karena setelah itu dana dilepas ke penjual. */
+export const BATAS_KLAIM_LABEL = PELEPASAN_OTOMATIS_JAM % 24 === 0 ? `${PELEPASAN_OTOMATIS_JAM / 24}×24 jam` : `${PELEPASAN_OTOMATIS_JAM} jam`;
 
 /** Alat bantu pengembangan (mis. simulasi aksi pembeli). Otomatis hilang pada build produksi. */
 export const MODE_DEMO = process.env.NODE_ENV !== "production";

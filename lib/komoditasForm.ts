@@ -1,4 +1,5 @@
 import type { BadgeProduk, Komoditas, KomoditasBaru, Spesifikasi, SumberKomoditas } from "@/types";
+import { BATAS_KLAIM_LABEL } from "./constants";
 import { isoTanggal } from "./format";
 import { sumberDari } from "./komoditas";
 import { IKON_BAWAAN, IKON_SUB_KATEGORI, SUB_KATEGORI } from "./kategori";
@@ -27,6 +28,9 @@ export interface DraftKomoditas {
   tanggalPanen: string;
   sumber: SumberKomoditas;
   ketersediaan: string;
+  /** Bulan 1–12 sebagai teks; kosong = tersedia sepanjang tahun. */
+  musimMulai: string;
+  musimSelesai: string;
   batasStokRendah: string;
   minBeli: string;
   maksBeli: string;
@@ -39,10 +43,8 @@ export interface DraftKomoditas {
   ongkir: string;
   estimasi: string;
   jamOrderTerakhir: string;
-  lokasiAmbil: string;
   beratKirimKg: string;
   bisaDiklaim: boolean;
-  batasKlaim: string;
   catatanKebijakan: string;
 }
 
@@ -52,6 +54,7 @@ export interface ErrorDraft {
   stok?: string;
   hargaCoret?: string;
   pengiriman?: string;
+  musim?: string;
 }
 
 export function draftKosong(sekarang: Date): DraftKomoditas {
@@ -78,6 +81,8 @@ export function draftKosong(sekarang: Date): DraftKomoditas {
     tanggalPanen: isoTanggal(sekarang),
     sumber: "Petani",
     ketersediaan: "Siap kirim",
+    musimMulai: "",
+    musimSelesai: "",
     batasStokRendah: "10",
     minBeli: "1",
     maksBeli: "",
@@ -89,10 +94,8 @@ export function draftKosong(sekarang: Date): DraftKomoditas {
     ongkir: "",
     estimasi: "",
     jamOrderTerakhir: "15:00",
-    lokasiAmbil: "",
     beratKirimKg: "",
     bisaDiklaim: true,
-    batasKlaim: "",
     catatanKebijakan: "",
   };
 }
@@ -120,6 +123,8 @@ export function draftDari(k: Komoditas): DraftKomoditas {
     tanggalPanen: k.tanggalPanen ?? "", // produk lama tanpa tanggal tetap memakai teks waktu panen lamanya
     sumber: sumberDari(k),
     ketersediaan: k.ketersediaan ?? "Siap kirim",
+    musimMulai: k.musim ? String(k.musim.mulai) : "",
+    musimSelesai: k.musim ? String(k.musim.selesai) : "",
     batasStokRendah: k.batasStokRendah === undefined ? "" : String(k.batasStokRendah),
     minBeli: k.minBeli === undefined ? "" : String(k.minBeli),
     maksBeli: k.maksBeli === undefined ? "" : String(k.maksBeli),
@@ -131,10 +136,8 @@ export function draftDari(k: Komoditas): DraftKomoditas {
     ongkir: k.pengiriman?.ongkir === undefined ? "" : String(k.pengiriman.ongkir),
     estimasi: k.pengiriman?.estimasi ?? "",
     jamOrderTerakhir: k.pengiriman?.jamOrderTerakhir ?? "",
-    lokasiAmbil: k.pengiriman?.lokasiAmbil ?? "",
     beratKirimKg: k.pengiriman?.beratKirimKg === undefined ? "" : String(k.pengiriman.beratKirimKg),
     bisaDiklaim: k.pengiriman?.bisaDiklaim ?? true,
-    batasKlaim: k.pengiriman?.batasKlaim ?? "",
     catatanKebijakan: k.pengiriman?.catatanKebijakan ?? "",
   };
 }
@@ -144,6 +147,7 @@ export function errorDraft(d: DraftKomoditas): ErrorDraft {
   if (d.stok !== "" && d.stokMaks !== "" && Number(d.stok) > Number(d.stokMaks)) error.stok = "Stok tidak boleh melebihi kapasitas";
   if (d.hargaCoret !== "" && d.harga !== "" && Number(d.hargaCoret) <= Number(d.harga)) error.hargaCoret = "Harga coret harus lebih besar dari harga jual";
   if (!d.antarKurir && !d.ambilDiKantor) error.pengiriman = "Pilih minimal satu opsi pengiriman";
+  if ((d.musimMulai === "") !== (d.musimSelesai === "")) error.musim = "Isi bulan mulai dan bulan selesai sekaligus, atau kosongkan keduanya";
   return error;
 }
 
@@ -176,6 +180,7 @@ export function dataDariDraft(d: DraftKomoditas): KomoditasBaru {
     tanggalPanen: d.tanggalPanen || undefined,
     sumber: d.sumber,
     ketersediaan: teksAtauKosong(d.ketersediaan),
+    musim: d.musimMulai !== "" && d.musimSelesai !== "" ? { mulai: Number(d.musimMulai), selesai: Number(d.musimSelesai) } : undefined,
     batasStokRendah: angkaAtauKosong(d.batasStokRendah),
     minBeli: angkaAtauKosong(d.minBeli),
     maksBeli: angkaAtauKosong(d.maksBeli),
@@ -188,10 +193,9 @@ export function dataDariDraft(d: DraftKomoditas): KomoditasBaru {
       ongkir: angkaAtauKosong(d.ongkir),
       estimasi: teksAtauKosong(d.estimasi),
       jamOrderTerakhir: teksAtauKosong(d.jamOrderTerakhir),
-      lokasiAmbil: teksAtauKosong(d.lokasiAmbil),
       beratKirimKg: angkaAtauKosong(d.beratKirimKg),
       bisaDiklaim: d.bisaDiklaim,
-      batasKlaim: d.bisaDiklaim ? teksAtauKosong(d.batasKlaim) : undefined,
+      batasKlaim: d.bisaDiklaim ? BATAS_KLAIM_LABEL : undefined,
       catatanKebijakan: teksAtauKosong(d.catatanKebijakan),
     },
   };

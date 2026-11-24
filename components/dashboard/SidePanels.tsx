@@ -1,26 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { Bike, AlertTriangle, Megaphone, Phone, Plus, CheckCircle2 } from "lucide-react";
+import { Bike, AlertTriangle, Phone, Plus, CheckCircle2 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { useDetail } from "@/components/detail/DetailProvider";
-import { KURIR_AKTIF, WARTA_LIST } from "@/lib/data/ringkasan";
+import { KURIR_AKTIF } from "@/lib/data/ringkasan";
 
 export function LogistikKurirCard() {
   const { open } = useDetail();
   const k = KURIR_AKTIF;
 
   return (
-    <Card className="p-5">
+    <Card className="flex flex-col p-5">
       <button
         type="button"
         onClick={() => open({ type: "kurir" })}
         className="flex w-full items-center gap-2 text-left text-sm font-semibold text-ink-900 hover:text-brand-700"
       >
         <Bike className="h-4 w-4 text-brand-600" />
-        Logistik BUMDes · Jadwal Penjemputan Kurir
+        Jadwal Kurir
       </button>
 
       <div className="mt-4 flex items-center gap-3">
@@ -42,10 +42,12 @@ export function LogistikKurirCard() {
         </div>
       </dl>
 
-      <Button variant="secondary" className="mt-4 w-full" onClick={() => open({ type: "kurir" })}>
-        <Phone className="h-3.5 w-3.5" />
-        Hubungi Mas Slamet
-      </Button>
+      <div className="mt-auto pt-4">
+        <Button variant="secondary" className="w-full" onClick={() => open({ type: "kurir" })}>
+          <Phone className="h-3.5 w-3.5" />
+          Hubungi Mas Slamet
+        </Button>
+      </div>
     </Card>
   );
 }
@@ -56,10 +58,10 @@ export function StokKritisCard() {
   const kritis = komoditas.filter((k) => k.statusStok === "kritis");
 
   return (
-    <Card className={kritis.length > 0 ? "border-danger-50 p-5" : "p-5"}>
+    <Card className={kritis.length > 0 ? "flex flex-col border-danger-50 p-5" : "flex flex-col p-5"}>
       <p className={`flex items-center gap-2 text-sm font-semibold ${kritis.length > 0 ? "text-danger-600" : "text-brand-700"}`}>
         {kritis.length > 0 ? <AlertTriangle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
-        Perhatian Lumbung · Ketersediaan Stok Kritis
+        Stok Kritis
       </p>
       <p className="mt-2 text-xs text-ink-500">
         {kritis.length > 0
@@ -87,52 +89,14 @@ export function StokKritisCard() {
         </div>
       )}
 
-      <Link
-        href="/komoditas"
-        className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-line bg-white px-4 py-2.5 text-sm font-medium text-ink-700 transition-colors duration-feedback ease-enter hover:bg-surface-muted"
-      >
-        Kelola Semua Stok
-      </Link>
-    </Card>
-  );
-}
-
-export function WartaCard() {
-  const { open } = useDetail();
-  const [utama, ...lain] = WARTA_LIST;
-
-  return (
-    <Card className="p-5">
-      <p className="flex items-center gap-2 text-sm font-semibold text-ink-900">
-        <Megaphone className="h-4 w-4 text-brand-600" />
-        Pengumuman BUMDes
-      </p>
-
-      <button
-        type="button"
-        onClick={() => open({ type: "warta", id: utama.id })}
-        className="mt-3 block w-full rounded-lg border border-line p-3 text-left transition-colors duration-feedback ease-enter hover:bg-surface-muted"
-      >
-        <span className="rounded bg-brand-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">{utama.label}</span>
-        <span className="ml-2 text-xs text-ink-400">{utama.tanggal}</span>
-        <span className="mt-2 block text-sm font-medium text-ink-900">{utama.judul}</span>
-        <span className="mt-1 line-clamp-3 block text-xs text-ink-500">{utama.isi}</span>
-      </button>
-
-      <ul className="mt-3 space-y-2 text-xs">
-        {lain.map((w) => (
-          <li key={w.id}>
-            <button
-              type="button"
-              onClick={() => open({ type: "warta", id: w.id })}
-              className="flex w-full items-center justify-between gap-3 text-left hover:text-brand-700"
-            >
-              <span className="text-ink-500">{w.judul}</span>
-              <span className="shrink-0 font-medium text-brand-600">Baca</span>
-            </button>
-          </li>
-        ))}
-      </ul>
+      <div className="mt-auto pt-4">
+        <Link
+          href="/komoditas"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-line bg-white px-4 py-2.5 text-sm font-medium text-ink-700 transition-colors duration-feedback ease-enter hover:bg-surface-muted"
+        >
+          Kelola Semua Stok
+        </Link>
+      </div>
     </Card>
   );
 }

@@ -1,4 +1,5 @@
-import type { JadwalOperasional, PengaturanLapak, StatusJadwal } from "@/types";
+import { formatTanggal, isoTanggal } from "@/lib/format";
+import type { JadwalOperasional, PengaturanLapak, StatusJadwal, TutupSementara } from "@/types";
 
 export const STATUS_JADWAL_LABEL: Record<StatusJadwal, string> = {
   "buka-penuh": "Buka Penuh",
@@ -49,15 +50,48 @@ export interface StatusLapak {
   buka: boolean;
   label: string; // "BUKA SEKARANG"
   keterangan: string; // "Hingga 17:30 WIB"
+  /** Id kategori induk yang sedang ditutup sementara walau lapak buka. Kosong bila tidak ada. */
+  kategoriTutup: string[];
 }
 
-// Status lapak untuk pembeli, dihitung dari jadwal + mode jeda tanam + jam sekarang.
-export function statusLapak(p: Pick<PengaturanLapak, "jadwal">, jedaTanam: boolean, date: Date): StatusLapak {
-  if (jedaTanam) return { kode: "jeda", buka: false, label: "TUTUP SEMENTARA", keterangan: "Jeda tanam / cuaca ekstrem" };
+// Penutupan sementara berlaku selama aktif dan belum melewati tanggal `sampai` (WIB).
+// Tanpa `sampai`, berlaku sampai admin membukanya manual.
+export function tutupBerlaku(tutup: TutupSementara, date: Date): boolean {
+  if (!tutup.aktif) return false;
+  return !tutup.sampai || isoTanggal(date) <= tutup.sampai;
+}
+
+// "2026-12-05" → "5 Desember 2026". Tengah hari WIB dipakai supaya tidak bergeser tanggal.
+export const labelTanggalIso = (iso: string): string => formatTanggal(new Date(`${iso}T12:00:00+07:00`));
+
+// Kalimat untuk warga: pesan admin bila ada, kalau tidak dibuat dari tanggal buka.
+export function pesanTutup(tutup: TutupSementara): string {
+  const pesan = tutup.pesan.trim();
+  if (pesan) return pesan;
+  return tutup.sampai ? `Tutup hingga ${labelTanggalIso(tutup.sampai)}` : "Tutup sementara";
+}
+
+// Memilih semua kategori sama saja dengan menutup seluruh toko (daftar kosong).
+export const rapikanKategoriTutup = (ids: string[], jumlahKategori: number): string[] => (ids.length >= jumlahKategori ? [] : ids);
+
+// Apakah satu kategori induk (id) sedang tidak menerima pesanan.
+export const kategoriDitutup = (status: Pick<StatusLapak, "kode" | "kategoriTutup">, indukId?: string): boolean =>
+  status.kode === "jeda" || (indukId !== undefined && status.kategoriTutup.includes(indukId));
+
+// Status lapak untuk pembeli, dihitung dari jadwal + penutupan sementara + jam sekarang.
+// Penutupan seluruh toko mengalahkan jadwal; penutupan per kategori membiarkan lapak
+// mengikuti jadwal dan hanya menandai kategori yang ditutup (`kategoriTutup`).
+export function statusLapak(p: Pick<PengaturanLapak, "jadwal">, tutup: TutupSementara, date: Date): StatusLapak {
+  const berlaku = tutupBerlaku(tutup, date);
+  if (berlaku && tutup.kategori.length === 0) {
+    return { kode: "jeda", buka: false, label: "TUTUP SEMENTARA", keterangan: pesanTutup(tutup), kategoriTutup: [] };
+  }
+  const kategoriTutup = berlaku ? tutup.kategori : [];
+
   const row = jadwalHariIni(p.jadwal, date);
-  if (!row || row.status === "tutup") return { kode: "libur", buka: false, label: "TUTUP HARI INI", keterangan: "Libur operasional" };
+  if (!row || row.status === "tutup") return { kode: "libur", buka: false, label: "TUTUP HARI INI", keterangan: "Libur operasional", kategoriTutup };
   const now = wibNow(date).minutes;
-  if (now >= menit(row.buka) && now < menit(row.tutup)) return { kode: "buka", buka: true, label: "BUKA SEKARANG", keterangan: `Hingga ${row.tutup} WIB` };
-  if (now < menit(row.buka)) return { kode: "belum-buka", buka: false, label: "BELUM BUKA", keterangan: `Buka pukul ${row.buka} WIB` };
-  return { kode: "sudah-tutup", buka: false, label: "SUDAH TUTUP", keterangan: "Buka lagi besok pagi" };
+  if (now >= menit(row.buka) && now < menit(row.tutup)) return { kode: "buka", buka: true, label: "BUKA SEKARANG", keterangan: `Hingga ${row.tutup} WIB`, kategoriTutup };
+  if (now < menit(row.buka)) return { kode: "belum-buka", buka: false, label: "BELUM BUKA", keterangan: `Buka pukul ${row.buka} WIB`, kategoriTutup };
+  return { kode: "sudah-tutup", buka: false, label: "SUDAH TUTUP", keterangan: "Buka lagi besok pagi", kategoriTutup };
 }

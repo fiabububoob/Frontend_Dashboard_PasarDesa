@@ -15,6 +15,11 @@ export const STATUS_LABEL: Record<StatusPesanan, string> = {
   dibatalkan: "Dibatalkan",
 };
 
+// Label status yang mengikuti cara pesanan sampai ke pembeli: untuk ambil mandiri, "Tiba di Pos" berarti "Siap Diambil".
+export function labelStatus(p: Pick<Pesanan, "status" | "opsiPengiriman">): string {
+  return p.status === "tiba-di-pos" && p.opsiPengiriman === "ambil-mandiri" ? "Siap Diambil di Pos" : STATUS_LABEL[p.status];
+}
+
 export type PeranPesanan = "sistem" | "penjual" | "pembeli";
 
 export interface LangkahStatus {
@@ -24,15 +29,17 @@ export interface LangkahStatus {
 }
 
 // Langkah berikutnya untuk sebuah pesanan, atau null bila sudah di ujung alur (selesai/dibatalkan).
-// Ambil mandiri melewati tahap "diantar": penjual langsung mengonfirmasi paket sudah ada di pos.
+// Ambil mandiri tidak memakai kurir: begitu dikemas, penjual langsung menandai paket siap diambil di pos
+// (status "tiba-di-pos"), tanpa tahap siap-jemput/diantar. "siap-jemput" tersisa hanya untuk data lama.
 export function langkahBerikutnya(p: Pick<Pesanan, "status" | "opsiPengiriman">): LangkahStatus | null {
+  const mandiri = p.opsiPengiriman === "ambil-mandiri";
   switch (p.status) {
     case "menunggu-pembayaran":
       return { ke: "perlu-dikemas", oleh: "sistem" }; // pembayaran terverifikasi (webhook)
     case "perlu-dikemas":
-      return { ke: "siap-jemput", oleh: "penjual" };
+      return mandiri ? { ke: "tiba-di-pos", oleh: "penjual" } : { ke: "siap-jemput", oleh: "penjual" };
     case "siap-jemput":
-      return p.opsiPengiriman === "ambil-mandiri" ? { ke: "tiba-di-pos", oleh: "penjual" } : { ke: "diantar", oleh: "penjual" };
+      return mandiri ? { ke: "tiba-di-pos", oleh: "penjual" } : { ke: "diantar", oleh: "penjual" };
     case "diantar":
       return { ke: "tiba-di-pos", oleh: "penjual" };
     case "tiba-di-pos":
@@ -157,6 +164,9 @@ export function labelPembayaran(p: DataBayar): string {
 // ---------------------------------------------------------------------------
 // Pesanan yang masih harus dikemas / menunggu kurir. Pesanan ambil mandiri tidak memakai kurir,
 // jadi tidak masuk daftar jemput, rekap kurir, dan surat jalan.
+// Langkah penjual untuk menandai paket siap, sesuai opsi pengiriman (dipakai tombol "Siapkan" di Ringkasan).
+export const statusPaketSiap = (p: Pick<Pesanan, "opsiPengiriman">): StatusPesanan => (p.opsiPengiriman === "ambil-mandiri" ? "tiba-di-pos" : "siap-jemput");
+
 export const perluDijemput = (p: Pesanan): boolean => (p.status === "perlu-dikemas" || p.status === "siap-jemput") && p.opsiPengiriman === "kurir-desa";
 
 export const hitungStatus = (pesanan: Pesanan[], status: StatusPesanan) => pesanan.filter((p) => p.status === status).length;

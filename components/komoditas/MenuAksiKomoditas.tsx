@@ -1,7 +1,8 @@
 "use client";
 
-import { Eye, EyeOff, MoreVertical, PackagePlus, ScanSearch } from "lucide-react";
+import { Eye, EyeOff, MoreVertical, PackagePlus, ScanSearch, Trash2 } from "lucide-react";
 import { Popover } from "@/components/layout/topbar/Popover";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
 import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { useDetail } from "@/components/detail/DetailProvider";
@@ -10,14 +11,16 @@ import type { Komoditas } from "@/types";
 
 const ITEM = "flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm text-ink-700 transition-colors duration-feedback ease-enter hover:bg-surface-muted";
 
-// Menu titik tiga di tiap baris/kartu: detail, catat panen, aktifkan/nonaktifkan.
+// Menu titik tiga di tiap baris/kartu: detail, catat panen, aktifkan/nonaktifkan, hapus.
 export function MenuAksiKomoditas({ k }: { k: Komoditas }) {
   const { open } = useDetail();
   const toast = useToast();
-  const { setTampil } = useDashboardData();
+  const { setTampil, hapusKomoditas } = useDashboardData();
+  const confirm = useConfirm();
 
   return (
     <Popover
+      portal
       lebar="w-52"
       pemicu={({ buka, toggle }) => (
         <button type="button" aria-haspopup="menu" aria-expanded={buka} aria-label={`Aksi lain untuk ${k.nama}`} onClick={toggle} className={BARIS_AKSI}>
@@ -49,6 +52,33 @@ export function MenuAksiKomoditas({ k }: { k: Komoditas }) {
           >
             {k.tampil ? <EyeOff className="h-4 w-4 text-ink-400" aria-hidden /> : <Eye className="h-4 w-4 text-ink-400" aria-hidden />}
             {k.tampil ? "Nonaktifkan" : "Aktifkan"}
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            className={`${ITEM} text-danger-600 hover:bg-danger-50`}
+            onClick={async () => {
+              tutup();
+              const ya = await confirm({
+                title: `Hapus ${k.nama}?`,
+                description: "Komoditas dihapus permanen dan tidak bisa dikembalikan. Bila hanya ingin menyembunyikannya dari katalog warga, pilih Nonaktifkan.",
+                confirmLabel: "Ya, Hapus",
+                tone: "danger",
+              });
+              if (!ya) return;
+              try {
+                await hapusKomoditas(k.id);
+                toast({ type: "success", title: "Komoditas dihapus", description: k.nama });
+              } catch (e) {
+                toast({
+                  type: "error",
+                  title: "Komoditas tidak bisa dihapus",
+                  description: `${e instanceof Error ? e.message : "Terjadi kesalahan."} Bila komoditas sudah pernah dipesan, gunakan Nonaktifkan.`,
+                });
+              }
+            }}
+          >
+            <Trash2 className="h-4 w-4" aria-hidden /> Hapus
           </button>
         </div>
       )}

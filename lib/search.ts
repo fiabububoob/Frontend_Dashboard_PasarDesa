@@ -1,7 +1,7 @@
 import { indukDari } from "@/lib/kategori";
 import type { DetailTarget, Komoditas, Pesanan, TransaksiKas, Warta } from "@/types";
 import { kategoriList } from "@/lib/stok";
-import { STATUS_LABEL } from "@/lib/pesanan";
+import { labelStatus } from "@/lib/pesanan";
 import { formatRupiah } from "@/lib/format";
 import { cocokSemuaKata } from "@/lib/text";
 
@@ -24,13 +24,13 @@ export function cari(query: string, data: { komoditas: Komoditas[]; pesanan: Pes
 
   const pesanan: HasilCari[] = data.pesanan
     .filter((p) =>
-      cocokSemuaKata(q, p.id, p.pembeli, p.alamat, p.dropPoint, p.metodeBayar, STATUS_LABEL[p.status], ...p.items.map((i) => i.komoditas)),
+      cocokSemuaKata(q, p.id, p.pembeli, p.alamat, p.dropPoint, p.metodeBayar, labelStatus(p), ...p.items.map((i) => i.komoditas)),
     )
     .map((p) => ({
       key: `pesanan-${p.id}`,
       grup: "Pesanan",
       judul: `#${p.id}`,
-      keterangan: `${p.pembeli} · ${STATUS_LABEL[p.status]} · ${p.items.map((i) => i.komoditas).join(", ")}`,
+      keterangan: `${p.pembeli} · ${labelStatus(p)} · ${p.items.map((i) => i.komoditas).join(", ")}`,
       target: { type: "pesanan", id: p.id },
     }));
 

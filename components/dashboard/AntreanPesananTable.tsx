@@ -39,7 +39,11 @@ function AntreanRow({ pesanan, index, onDone }: { pesanan: Pesanan; index: numbe
     });
     if (ok) {
       onDone(pesanan.id);
-      toast({ type: "success", title: "Paket siap di rak", description: `#${pesanan.id} menunggu kurir desa.` });
+      toast({
+        type: "success",
+        title: pesanan.opsiPengiriman === "ambil-mandiri" ? "Paket siap diambil di pos" : "Paket siap di rak",
+        description: pesanan.opsiPengiriman === "ambil-mandiri" ? `#${pesanan.id} menunggu pembeli datang mengambil.` : `#${pesanan.id} menunggu kurir desa.`,
+      });
     } else {
       toast({ type: "error", title: "Gagal menyiapkan paket", description: galat });
     }
@@ -47,16 +51,18 @@ function AntreanRow({ pesanan, index, onDone }: { pesanan: Pesanan; index: numbe
 
   return (
     <tr className="animate-fade-in" style={stagger(index)}>
-      <td className="py-3 pr-3">
-        <button type="button" onClick={() => open({ type: "pesanan", id: pesanan.id })} className="text-left">
-          <span className="block whitespace-nowrap font-medium text-ink-900 hover:text-brand-700 hover:underline">#{pesanan.id}</span>
-          <span className="block text-xs text-ink-500">{pesanan.pembeli}</span>
+      <td className="py-3 pr-4">
+        <button type="button" onClick={() => open({ type: "pesanan", id: pesanan.id })} className="block max-w-[260px] text-left">
+          <span className="block truncate font-medium text-ink-900 hover:text-brand-700 hover:underline">#{pesanan.id}</span>
+          <span className="mt-0.5 block truncate text-xs text-ink-500">{pesanan.items.map((item) => item.komoditas).join(" + ")}</span>
         </button>
       </td>
-      <td className="py-3 pr-3 text-ink-700">{pesanan.items.map((item) => item.komoditas).join(" + ")}</td>
-      <td className="py-3 pr-3 text-ink-700">{pesanan.dropPoint}</td>
-      <td className="py-3 pr-3">
-        <StatusBadge status={pesanan.status} />
+      <td className="py-3 pr-4">
+        <span className="block truncate text-ink-900">{pesanan.pembeli}</span>
+        <span className="mt-0.5 block max-w-[200px] truncate text-xs text-ink-500">{pesanan.dropPoint}</span>
+      </td>
+      <td className="py-3 pr-4">
+        <StatusBadge pesanan={pesanan} />
       </td>
       <td className="py-3 text-right">
         {sudahSiap ? (
@@ -101,13 +107,12 @@ export function AntreanPesananTable() {
       </div>
 
       <div className="mt-4 flex-1 overflow-x-auto">
-        <table className="w-full min-w-[640px] text-left text-sm">
+        <table className="w-full min-w-[520px] text-left text-sm">
           <thead>
             <tr className="border-b border-line text-xs uppercase text-ink-400">
-              <th className="pb-3 font-medium">ID Pesanan &amp; Pemesan</th>
-              <th className="pb-3 font-medium">Komoditas &amp; Kuantitas</th>
-              <th className="pb-3 font-medium">Tujuan Drop-Point</th>
-              <th className="pb-3 font-medium">Status Kemas</th>
+              <th className="pb-3 pr-4 font-medium">Pesanan</th>
+              <th className="pb-3 pr-4 font-medium">Pembeli</th>
+              <th className="pb-3 pr-4 font-medium">Status</th>
               <th className="pb-3 text-right font-medium">Aksi</th>
             </tr>
           </thead>

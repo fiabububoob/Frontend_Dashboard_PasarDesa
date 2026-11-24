@@ -1,10 +1,10 @@
 import type { Komoditas, Pesanan, StatCard } from "@/types";
-import { RINGKASAN_PENJUALAN } from "@/lib/data/ringkasan";
 import { PRE_ORDER_SAAT_INI } from "@/lib/data/komoditas";
 import { BULAN_LAPORAN, JAM_JEMPUT_SORE } from "./constants";
 import { formatRupiah } from "./format";
 import { pesananEscrow } from "./kas";
 import { hitungStatus, hitungTotal } from "./pesanan";
+import { ringkasanBulan } from "./penjualan";
 import { AMBANG_KRITIS, hitungKritis, hitungTampil } from "./stok";
 
 // Pembentuk kartu statistik. Semuanya fungsi murni (data masuk → kartu keluar),
@@ -18,30 +18,35 @@ interface DataRingkasan {
   pesanan: Pesanan[];
   saldoAktif: number;
   omset: number;
+  /** Waktu sekarang; bila belum ada (render awal), jumlah transaksi & tren bulanan dilewati. */
+  sekarang?: Date | null;
 }
 
-export function statRingkasan({ komoditas, pesanan, saldoAktif, omset }: DataRingkasan): StatCard[] {
+// Teks kartu sengaja singkat (angka + satu kata) supaya muat satu baris di kartu Dashboard.
+export function statRingkasan({ komoditas, pesanan, saldoAktif, omset, sekarang }: DataRingkasan): StatCard[] {
   const kritis = hitungKritis(komoditas);
+  const bulan = sekarang ? ringkasanBulan(pesanan, sekarang) : null;
+  const tren: StatCard["trend"] = bulan && bulan.perubahanPersen !== null ? { direction: bulan.perubahanPersen >= 0 ? "up" : "down", value: `${Math.abs(bulan.perubahanPersen)}%` } : undefined;
   return [
     {
       id: "penjualan",
       label: "Total Penjualan Bulan Ini",
       value: formatRupiah(omset),
-      helper: `${RINGKASAN_PENJUALAN.transaksi} transaksi terverifikasi`,
-      trend: { direction: "up", value: RINGKASAN_PENJUALAN.tren },
+      helper: bulan ? `${bulan.transaksi} transaksi` : undefined,
+      trend: tren,
     },
     {
       id: "dikemas",
       label: "Pesanan Perlu Dikemas",
-      value: `${hitungStatus(pesanan, "perlu-dikemas")} Keranjang Pesanan`,
+      value: `${hitungStatus(pesanan, "perlu-dikemas")} Pesanan`,
       helper: `Kurir jemput ${JAM_JEMPUT_SORE}`,
     },
-    { id: "saldo", label: "Saldo Kas Siap Dicairkan", value: formatRupiah(saldoAktif), helper: "Kas BUMDes Sukorejo (Nol Potongan)" },
+    { id: "saldo", label: "Saldo Siap Dicairkan", value: formatRupiah(saldoAktif), helper: "Nol potongan" },
     {
       id: "komoditas",
-      label: "Total Komoditas Aktif",
-      value: `${hitungTampil(komoditas)} Varietas Hasil Tani`,
-      helper: kritis > 0 ? `${kritis} stok kritis (<${AMBANG_KRITIS} unit)` : "Semua stok panen aman",
+      label: "Komoditas Aktif",
+      value: `${hitungTampil(komoditas)} Varietas`,
+      helper: kritis > 0 ? `${kritis} stok kritis` : "Semua stok aman",
       tone: toneStok(kritis),
     },
   ];

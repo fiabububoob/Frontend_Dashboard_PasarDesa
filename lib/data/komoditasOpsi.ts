@@ -4,8 +4,7 @@ export const OPSI_KETERSEDIAAN = ["Siap kirim", "Panen pagi", "Pre-order", "Stok
 export const OPSI_GARANSI = ["Garansi Mutu BUMDes Sukorejo", "Garansi Uang Kembali 1×24 jam", "Tanpa garansi"];
 export const OPSI_AREA_ANTAR = ["Seluruh RT/RW desa", "Dusun Krajan saja", "Dusun Sidomulyo saja", "Sekitar Balai Desa"];
 export const OPSI_ESTIMASI = ["Hari ini", "Besok pagi", "1–2 hari", "2–3 hari"];
-export const OPSI_LOKASI_AMBIL = ["Kantor BUMDes Sukorejo", "Lumbung Krajan", "Pos Drop-Point Krajan RT 02"];
-export const OPSI_BATAS_KLAIM = ["1×24 jam", "2×24 jam", "3×24 jam"];
+export const NAMA_BULAN = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 export const LABEL_JENIS_SUMBER = ["Petani", "UMKM", "BUMDes"] as const;
 
 // Isian spesifikasi menyesuaikan kategori utama. `alias` = label lama pada data yang sudah ada.

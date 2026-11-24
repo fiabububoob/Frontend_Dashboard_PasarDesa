@@ -19,11 +19,17 @@ export interface PengirimanKomoditas {
   estimasi?: string;
   /** Jam terakhir pemesanan masuk hari itu, mis. "15:00". */
   jamOrderTerakhir?: string;
-  lokasiAmbil?: string;
   beratKirimKg?: number;
   bisaDiklaim: boolean;
   batasKlaim?: string;
   catatanKebijakan?: string;
+}
+
+// Bulan tersedia produk musiman (1 = Januari … 12 = Desember). Boleh melewati akhir tahun,
+// mis. mulai 11, selesai 2. Produk tanpa musim dianggap tersedia sepanjang tahun.
+export interface MusimKomoditas {
+  mulai: number;
+  selesai: number;
 }
 
 export interface Komoditas {
@@ -69,12 +75,13 @@ export interface Komoditas {
   keunggulan?: string[];
   garansiMutu?: string;
   pengiriman?: PengirimanKomoditas;
+  musim?: MusimKomoditas;
 }
 
 // Data minimal untuk membuat komoditas baru (form tambah & impor CSV).
 // id, sku, status stok, dan keterangan panen dibuat oleh state komoditas.
 export type KomoditasBaru = Pick<Komoditas, "nama" | "gambar" | "kategori" | "asalBlok" | "harga" | "satuan" | "stok" | "stokMaks"> &
-  Partial<Pick<Komoditas, "sumber" | "ketersediaan" | "batasStokRendah" | "minBeli" | "maksBeli" | "keunggulan" | "garansiMutu" | "pengiriman" | "foto" | "tag" | "hargaKeterangan" | "tampil" | "hargaCoret" | "ukuran" | "deskripsi" | "spesifikasi" | "saranPenyimpanan" | "tanggalPanen" | "badge">>;
+  Partial<Pick<Komoditas, "sumber" | "ketersediaan" | "batasStokRendah" | "minBeli" | "maksBeli" | "keunggulan" | "garansiMutu" | "pengiriman" | "foto" | "tag" | "hargaKeterangan" | "tampil" | "hargaCoret" | "ukuran" | "deskripsi" | "spesifikasi" | "saranPenyimpanan" | "tanggalPanen" | "badge" | "musim">>;
 
 export type KomoditasUbah = Partial<
   Pick<
@@ -97,6 +104,7 @@ export type KomoditasUbah = Partial<
     | "saranPenyimpanan"
     | "tanggalPanen"
     | "badge"
+    | "musim"
     | "sumber"
     | "ketersediaan"
     | "batasStokRendah"

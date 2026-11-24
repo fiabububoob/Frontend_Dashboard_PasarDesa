@@ -11,9 +11,13 @@ import { useDashboardData } from "@/components/providers/DashboardDataProvider";
 import { useStatusLapak } from "@/components/providers/useStatusLapak";
 import { hitungStatus } from "@/lib/pesanan";
 
-const ITEM_BASE = "flex w-full items-center gap-3 rounded-lg border-l-[3px] border-transparent px-3 py-2.5 text-sm transition-colors duration-feedback ease-enter";
+// Item aktif: latar gradasi hijau (kiri pekat → memudar ke kanan) + batang indikator
+// bergradasi vertikal di sisi kiri yang "tumbuh" saat menu aktif (animate-grow-y, mengikuti
+// token motion). Batang dibuat sebagai elemen sendiri karena border CSS tidak bisa bergradasi
+// pada sudut membulat; overflow-hidden + rounded-lg di link membuat ujungnya ikut melengkung.
+const ITEM_BASE = "relative flex w-full items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm transition-colors duration-feedback ease-enter";
 const ITEM_IDLE = "font-medium text-ink-700 hover:bg-surface-muted hover:text-ink-900";
-const ITEM_ACTIVE = "border-brand-600 bg-brand-50 font-semibold text-brand-900";
+const ITEM_ACTIVE = "bg-gradient-to-r from-brand-100 via-brand-50 to-brand-50/0 font-semibold text-brand-900";
 
 function GroupLabel({ children }: { children: string }) {
   return <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-ink-500">{children}</p>;
@@ -58,6 +62,7 @@ export function Sidebar() {
             return (
               <li key={item.href}>
                 <Link href={item.href} aria-current={active ? "page" : undefined} className={clsx(ITEM_BASE, "justify-between", active ? ITEM_ACTIVE : ITEM_IDLE)}>
+                  {active && <span aria-hidden className="absolute inset-y-0 left-0 w-[3px] origin-center animate-grow-y bg-gradient-to-b from-brand-500 via-brand-600 to-brand-700" />}
                   <span className="flex min-w-0 items-center gap-3">
                     <Icon className={clsx("h-[18px] w-[18px] shrink-0", active ? "text-brand-600" : "text-ink-400")} />
                     <span className="truncate">{item.label}</span>

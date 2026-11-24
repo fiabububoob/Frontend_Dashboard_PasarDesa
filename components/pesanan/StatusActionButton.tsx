@@ -20,10 +20,11 @@ interface DeskripsiLangkah {
 // Teks tombol, dialog konfirmasi, dan toast untuk langkah yang dikerjakan PENJUAL (keputusan D4).
 // Tiap langkah menandai paket fisik yang sulit ditarik kembali, jadi semuanya diberi dialog konfirmasi.
 function deskripsiLangkah(p: Pesanan, ke: StatusPesanan): DeskripsiLangkah | null {
+  const mandiri = p.opsiPengiriman === "ambil-mandiri";
   const rincian = [
     { label: "Pesanan", value: `#${p.id}` },
     { label: "Pembeli", value: p.pembeli },
-    { label: "Drop-point", value: p.dropPoint },
+    { label: mandiri ? "Ambil di" : "Drop-point", value: p.dropPoint },
   ];
   switch (ke) {
     case "siap-jemput":
@@ -41,8 +42,21 @@ function deskripsiLangkah(p: Pesanan, ke: StatusPesanan): DeskripsiLangkah | nul
         toast: { title: "Paket dalam antaran", description: `#${p.id} menuju ${p.dropPoint}.` },
       };
     case "tiba-di-pos":
+      if (mandiri) {
+        return {
+          tombol: "Tandai Siap Diambil di Pos",
+          berhasil: "Siap Diambil",
+          konfirmasi: {
+            title: "Tandai pesanan siap diambil di pos?",
+            description: "Pembeli akan diberi tahu untuk datang mengambil sendiri, lalu menekan \"Pesanan Diterima\" di aplikasi. Dana Anda dilepas setelah itu, atau otomatis bila pembeli tidak merespons.",
+            details: rincian,
+            confirmLabel: "Ya, Siap Diambil",
+          },
+          toast: { title: "Pesanan siap diambil", description: "Menunggu pembeli datang ke pos dan menerima pesanan." },
+        };
+      }
       return {
-        tombol: p.opsiPengiriman === "ambil-mandiri" ? "Konfirmasi Paket Sudah di Pos" : "Konfirmasi Tiba di Drop-Point",
+        tombol: "Konfirmasi Tiba di Drop-Point",
         berhasil: "Tiba di Pos",
         konfirmasi: {
           title: "Konfirmasi paket sudah ada di pos?",
@@ -60,6 +74,10 @@ function deskripsiLangkah(p: Pesanan, ke: StatusPesanan): DeskripsiLangkah | nul
 const TEKS_MENUNGGU: Partial<Record<StatusPesanan, string>> = {
   "menunggu-pembayaran": "Menunggu pembayaran pembeli (otomatis lanjut setelah Midtrans mengonfirmasi lunas).",
   "tiba-di-pos": "Menunggu pembeli menekan \"Pesanan Diterima\".",
+};
+
+const TEKS_MENUNGGU_AMBIL: Partial<Record<StatusPesanan, string>> = {
+  "tiba-di-pos": "Siap diambil di pos. Menunggu pembeli datang dan menekan \"Pesanan Diterima\" di aplikasi.",
 };
 
 // Teks tombol nonaktif bila tidak ada langkah berikutnya untuk penjual.
@@ -97,7 +115,9 @@ export function StatusActionButton({ pesanan }: { pesanan: Pesanan }) {
     const oleh = langkah.oleh;
     return (
       <div className="flex flex-col items-end gap-2">
-        <p className="text-sm text-ink-500">{TEKS_MENUNGGU[pesanan.status] ?? "Menunggu pihak lain."}</p>
+        <p className="text-sm text-ink-500">
+          {(pesanan.opsiPengiriman === "ambil-mandiri" && TEKS_MENUNGGU_AMBIL[pesanan.status]) || TEKS_MENUNGGU[pesanan.status] || "Menunggu pihak lain."}
+        </p>
         {/* Alat pengembangan: meniru sistem/pembeli. Hilang di build produksi. */}
         {/* Pesanan Midtrans hanya lanjut lewat konfirmasi gateway; server menolak loncatan manual (gunakan Midtrans Simulator di sandbox). */}
         {MODE_DEMO && oleh !== "penjual" && !(oleh === "sistem" && pesanan.metodeBayar === "MIDTRANS") && (

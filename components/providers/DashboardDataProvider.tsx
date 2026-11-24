@@ -10,7 +10,7 @@ import { usePesananState } from "./slices/usePesananState";
 import { useAduanState } from "./slices/useAduanState";
 import { useUlasanState } from "./slices/useUlasanState";
 import { useSekarang } from "@/lib/hooks/useSekarang";
-import { pesananJatuhTempo } from "@/lib/pesanan";
+import { pesananJatuhTempo, statusPaketSiap } from "@/lib/pesanan";
 
 // Satu sumber data "hidup" untuk Ringkasan, Komoditas, Pesanan, Kas, Pengaturan,
 // modal detail, dan pencarian. State tiap domain ada di ./slices/*; provider ini
@@ -78,7 +78,15 @@ export function DashboardDataProvider({ children, profilAwal }: { children: Reac
     });
   }, [sekarang, pesananSlice.pesanan, pesananSlice.statusPesanan, setStatusPesanan]);
 
-  const siapkanPaket = useCallback((id: string) => setStatusPesanan(id, "siap-jemput"), [setStatusPesanan]);
+  // Tujuan "paket siap" tergantung opsi pengiriman: kurir desa → siap-jemput, ambil mandiri → siap diambil di pos.
+  const siapkanPaket = useCallback(
+    async (id: string) => {
+      const p = cariPesanan(id);
+      if (!p) throw new Error("Pesanan tidak ditemukan.");
+      await setStatusPesanan(id, statusPaketSiap(p));
+    },
+    [cariPesanan, setStatusPesanan],
+  );
 
   // Komplain pembeli (diajukan lewat app pembeli; di sini disimulasikan), keputusan penjual, atau teruskan ke BUMDes.
   const ajukanKomplain = useCallback((id: string, komplain: Komplain) => perbarui(id, (p) => ajukanKomplainPada(p, komplain)), [perbarui]);

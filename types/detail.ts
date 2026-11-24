@@ -19,10 +19,10 @@ export type DetailTarget =
   | { type: "warta"; id: string }
   | { type: "tambah-panen"; komoditasId?: string }
   | { type: "rekap" }
-  | { type: "laporan" }
   | { type: "hotline" }
   | { type: "form-komoditas"; id?: string } // id kosong = tambah baru, ada id = ubah
   | { type: "impor-ekspor" }
+  | { type: "laporan-pesanan" } // panel Cetak Laporan di halaman Pesanan
   | { type: "nota"; id: string }
   | { type: "surat-jalan" }
   | { type: "transaksi"; id: string }

@@ -65,3 +65,8 @@ export async function simpanKomoditas(data: Omit<Komoditas, "id" | "statusStok">
 export async function ubahTampilKomoditas(id: string, tampil: boolean) {
   return panggil((token) => apiFetch<unknown>(`/products/${id}`, { token, method: "PATCH", body: JSON.stringify({ is_visible: tampil }) }));
 }
+
+// Menghapus permanen. Backend menolak (500) bila komoditas masih terkait data lain, mis. pernah dipesan dari aplikasi mobile.
+export async function hapusKomoditasServer(id: string) {
+  return panggil((token) => apiFetch<unknown>(`/products/${id}`, { token, method: "DELETE" }));
+}

@@ -7,6 +7,8 @@ import { pesananDariApi, perubahanKeApi } from "@/lib/pesananApi";
 import { butuhKurir, terapkanStatus } from "@/lib/pesanan";
 import type { Pesanan, StatusPesanan } from "@/types";
 
+const INTERVAL_SEGARKAN_MS = 15_000;
+
 export type StatusMuatPesanan = "memuat" | "siap" | "gagal";
 
 // State pesanan, disimpan di Express API (/admin/orders) lewat server action. Aksi bersifat async dan
@@ -22,8 +24,9 @@ export function usePesananState() {
     ref.current = pesanan;
   }, [pesanan]);
 
-  const muatPesanan = useCallback(async () => {
-    setStatus("memuat");
+  // `senyap` = penyegaran latar belakang: tanpa status "memuat", dan bila gagal data yang sudah tampil dipertahankan.
+  const muatPesanan = useCallback(async (senyap = false) => {
+    if (!senyap) setStatus("memuat");
     const hasil = await ambilPesanan();
     if (hasil.ok) {
       setPesanan(hasil.data.map(pesananDariApi));
@@ -31,6 +34,7 @@ export function usePesananState() {
       setStatus("siap");
       return;
     }
+    if (senyap) return;
     setPesanan(PESANAN_LIST);
     setGalat(hasil.message);
     setStatus("gagal");
@@ -38,6 +42,20 @@ export function usePesananState() {
 
   useEffect(() => {
     void muatPesanan();
+  }, [muatPesanan]);
+
+  // Pesanan baru dari aplikasi pembeli, konfirmasi bayar Midtrans, dan "Pesanan Diterima" terjadi di luar dashboard,
+  // jadi daftar disegarkan berkala (hanya saat tab terlihat) dan saat tab kembali difokuskan.
+  useEffect(() => {
+    const segarkan = () => {
+      if (document.visibilityState === "visible") void muatPesanan(true);
+    };
+    const timer = window.setInterval(segarkan, INTERVAL_SEGARKAN_MS);
+    document.addEventListener("visibilitychange", segarkan);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", segarkan);
+    };
   }, [muatPesanan]);
 
   const cariPesanan = useCallback((id: string) => ref.current.find((p) => p.id === id), []);

@@ -18,6 +18,14 @@ export function formatRupiah(value: number): string {
   return `${sign}Rp ${formatNumber(Math.abs(value))}`;
 }
 
+// Rupiah ringkas untuk chart & daftar padat: "Rp 6,1 jt", "Rp 850 rb", "Rp 500".
+export function formatRupiahRingkas(value: number): string {
+  const abs = Math.abs(value);
+  if (abs >= 1_000_000) return `Rp ${(value / 1_000_000).toFixed(1).replace(".", ",")} jt`;
+  if (abs >= 1_000) return `Rp ${Math.round(value / 1_000)} rb`;
+  return formatRupiah(value);
+}
+
 // Tanggal dalam WIB. "full" → "Senin, 5 Oktober 2026"; "long" → "5 Oktober 2026".
 export function formatTanggal(date: Date, gaya: "full" | "long" = "long"): string {
   return new Intl.DateTimeFormat(LOCALE, { dateStyle: gaya, timeZone: ZONA_WAKTU }).format(date);

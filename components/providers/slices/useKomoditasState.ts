@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { KOMODITAS_LIST } from "@/lib/data/komoditas";
-import { ambilKomoditas, simpanKomoditas, ubahTampilKomoditas } from "@/lib/actions/komoditas";
+import { ambilKomoditas, hapusKomoditasServer, simpanKomoditas, ubahTampilKomoditas } from "@/lib/actions/komoditas";
 import { komoditasDariApi } from "@/lib/komoditasApi";
 import { buatKomoditas, tambahStokKomoditas, ubahKomoditas as terapkanUbah } from "@/lib/komoditas";
 import type { Komoditas, KomoditasBaru, KomoditasUbah } from "@/types";
@@ -50,7 +50,10 @@ export function useKomoditasState() {
     const hasil = await simpanKomoditas(lengkap, idServer);
     if (!hasil.ok) throw new Error(hasil.message);
     const tersimpan = komoditasDariApi(hasil.data);
-    setKomoditas((daftar) => (idServer ? daftar.map((k) => (k.id === idServer ? tersimpan : k)) : [tersimpan, ...daftar]));
+    // Perbarui ref sekarang juga (bukan menunggu render): impor CSV menambah banyak item beruntun dan
+    // butuh daftar terbaru untuk membuat SKU berikutnya; kalau tidak, SKU kembar ditolak database.
+    daftarRef.current = idServer ? daftarRef.current.map((k) => (k.id === idServer ? tersimpan : k)) : [tersimpan, ...daftarRef.current];
+    setKomoditas(daftarRef.current);
     return tersimpan;
   }, []);
 
@@ -77,6 +80,17 @@ export function useKomoditasState() {
     [pastikanTerhubung],
   );
 
+  const hapusKomoditas = useCallback(
+    async (id: string) => {
+      pastikanTerhubung();
+      const hasil = await hapusKomoditasServer(id);
+      if (!hasil.ok) throw new Error(hasil.message);
+      daftarRef.current = daftarRef.current.filter((k) => k.id !== id);
+      setKomoditas(daftarRef.current);
+    },
+    [pastikanTerhubung],
+  );
+
   const tambahKomoditas = useCallback(
     async (data: KomoditasBaru) => {
       pastikanTerhubung();
@@ -87,7 +101,7 @@ export function useKomoditasState() {
 
   // Hasil di-memo supaya konsumen context tidak render ulang kecuali datanya benar-benar berubah.
   return useMemo(
-    () => ({ komoditas, statusKomoditas, galatKomoditas, muatKomoditas, tambahStok, tambahKomoditas, ubahKomoditas, setTampil }),
-    [komoditas, statusKomoditas, galatKomoditas, muatKomoditas, tambahStok, tambahKomoditas, ubahKomoditas, setTampil],
+    () => ({ komoditas, statusKomoditas, galatKomoditas, muatKomoditas, tambahStok, tambahKomoditas, ubahKomoditas, setTampil, hapusKomoditas }),
+    [komoditas, statusKomoditas, galatKomoditas, muatKomoditas, tambahStok, tambahKomoditas, ubahKomoditas, setTampil, hapusKomoditas],
   );
 }

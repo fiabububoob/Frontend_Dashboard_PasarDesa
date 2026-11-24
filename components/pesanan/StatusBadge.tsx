@@ -1,6 +1,6 @@
 import { Badge, type BadgeTone } from "@/components/ui/Badge";
-import { STATUS_LABEL } from "@/lib/pesanan";
-import type { StatusPesanan } from "@/types";
+import { labelStatus } from "@/lib/pesanan";
+import type { Pesanan, StatusPesanan } from "@/types";
 
 // Centralizes the label + color mapping for order status. Both the
 // Ringkasan "Antrean Pesanan Mendesak" table and the full Pesanan page use
@@ -16,6 +16,7 @@ const TONE: Record<StatusPesanan, BadgeTone> = {
   dibatalkan: "danger",
 };
 
-export function StatusBadge({ status }: { status: StatusPesanan }) {
-  return <Badge tone={TONE[status]}>{STATUS_LABEL[status]}</Badge>;
+// Terima seluruh pesanan (bukan hanya status) agar labelnya sesuai opsi pengiriman: "Siap Diambil di Pos" vs "Tiba di Pos".
+export function StatusBadge({ pesanan }: { pesanan: Pick<Pesanan, "status" | "opsiPengiriman"> }) {
+  return <Badge tone={TONE[pesanan.status]}>{labelStatus(pesanan)}</Badge>;
 }

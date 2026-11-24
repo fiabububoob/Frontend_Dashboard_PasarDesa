@@ -105,6 +105,8 @@ export interface Pesanan {
   totalBayar?: number;
   status: StatusPesanan;
   waktu: string;
+  /** Waktu pesanan dibuat (ISO). Dasar pengelompokan penjualan per hari di Dashboard dan Laporan Pesanan. */
+  dibuatPada?: string;
   /** Waktu paket tiba di pos (ISO). Dana dilepas otomatis sekian jam setelahnya bila pembeli belum menerima. */
   tibaDiPosPada?: string;
   total: number;

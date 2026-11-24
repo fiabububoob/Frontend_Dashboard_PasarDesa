@@ -61,7 +61,7 @@ export function RekapContent() {
                   {p.pembeli} · {p.dropPoint}
                 </span>
               </span>
-              <StatusBadge status={p.status} />
+              <StatusBadge pesanan={p} />
             </li>
           ))}
         </ul>

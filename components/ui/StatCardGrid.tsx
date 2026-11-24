@@ -19,14 +19,15 @@ const TONE_VALUE_STYLES: Record<NonNullable<StatCardType["tone"]>, string> = {
   danger: "text-danger-600",
 };
 
-export function StatCardGrid({ stats, columns = 4 }: { stats: StatCardType[]; columns?: 3 | 4 }) {
+// compact: kartu lebih rapat dengan angka lebih kecil (dipakai di Dashboard yang kartunya banyak).
+export function StatCardGrid({ stats, columns = 4, compact = false }: { stats: StatCardType[]; columns?: 3 | 4; compact?: boolean }) {
   return (
     <div className={clsx("grid grid-cols-1 gap-4 sm:grid-cols-2", columns === 3 ? "lg:grid-cols-3" : "lg:grid-cols-4")}>
       {stats.map((stat, index) => (
         // Offset & Delay: kartu muncul berurutan (40ms) sesuai urutan baca
-        <Card key={stat.id} className="animate-fade-up p-5" style={stagger(index)}>
-          <p className="text-sm text-ink-700">{stat.label}</p>
-          <p className={clsx("mt-2 font-display text-[32px] font-bold leading-tight tracking-tight", TONE_VALUE_STYLES[stat.tone ?? "default"])}>
+        <Card key={stat.id} className={clsx("animate-fade-up", compact ? "p-4" : "p-5")} style={stagger(index)}>
+          <p className={clsx("text-ink-700", compact ? "text-xs" : "text-sm")}>{stat.label}</p>
+          <p className={clsx("font-display font-bold leading-tight tracking-tight", compact ? "mt-1 text-xl" : "mt-2 text-[32px]", TONE_VALUE_STYLES[stat.tone ?? "default"])}>
             <CountUp value={stat.value} />
           </p>
           {(stat.helper || stat.trend) && (
